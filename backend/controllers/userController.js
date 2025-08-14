@@ -14,7 +14,7 @@ export const register = async (req, res) => {
 
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({
+      return res.status(409).json({
         message: "User is already registered",
         success: false,
       });
@@ -29,7 +29,7 @@ export const register = async (req, res) => {
       role,
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
       message: "User Registered Successfully",
       success: true,
     });
@@ -54,7 +54,7 @@ export const login = async (req, res) => {
 
     let user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({
+      return res.status(401).json({
         message: "User is not registered",
         success: false,
       });
@@ -62,14 +62,14 @@ export const login = async (req, res) => {
 
     const isPasswordMatch = await bcrypt.compare(password, user.password);
     if (!isPasswordMatch) {
-      return res.status(400).json({
+      return res.status(404).json({
         message: "Incorrect email or password",
         success: false,
       });
     }
 
     if (role !== user.role) {
-      return res.status(400).json({
+      return res.status(404).json({
         message: "Account doesn't exists with current role",
         success: false,
       });
@@ -97,7 +97,7 @@ export const login = async (req, res) => {
 
     // 🍪 Set token in HTTP-only cookie for client storage
     return res
-      .status(200)
+      .status(201)
       .cookie("token", token, {
         maxAge: 1 * 24 * 60 * 60 * 1000, // 1 day in ms
         httpOnly: true, // 🚫 Not accessible via JavaScript (XSS protection)
@@ -140,7 +140,7 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-    // const file = req.body;
+    const file = req.body;
     let skillsArray;
     if (skills) {
       skillsArray = skills
@@ -152,7 +152,7 @@ export const updateProfile = async (req, res) => {
 
     let user = await User.findById(userId);
     if (!user) {
-      return res.status(400).json({
+      return res.status(404).json({
         message: "User not found",
         success: false,
       });
