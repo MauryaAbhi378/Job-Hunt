@@ -1,6 +1,8 @@
 import { User } from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
   try {
@@ -10,6 +12,13 @@ export const register = async (req, res) => {
         message: "Something is missing",
         success: false,
       });
+    }
+
+    const file = req.file;
+    let cloudResponse
+    if (file) {
+      const fileUri = getDataUri(file);
+      cloudResponse = await cloudinary.uploader.upload(fileUri.content);
     }
 
     const user = await User.findOne({ email });
@@ -27,6 +36,9 @@ export const register = async (req, res) => {
       password: hashedPassword,
       phoneNumber,
       role,
+      profile: {
+        profilePhoto: cloudResponse.secure_url || null,
+      },
     });
 
     return res.status(201).json({
@@ -95,6 +107,7 @@ export const login = async (req, res) => {
       profile: user.profile,
     };
 
+    console.log(user.role)
     // 🍪 Set token in HTTP-only cookie for client storage
     return res
       .status(201)
@@ -125,7 +138,7 @@ export const logout = async (req, res) => {
         maxAge: 0,
       })
       .json({
-        messgae: "Logged out Successully",
+        message: "Logged out Successully",
         success: true,
       });
   } catch (error) {
@@ -140,52 +153,70 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-    const file = req.body;
+    const file = req.file;
+
+    let cloudResponse;
+    if (file) {
+      const fileUri = getDataUri(file);
+      cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
+        resource_type: "auto",
+        use_filename: true,
+        unique_filename: false,
+      });
+    }
+
     let skillsArray;
     if (skills) {
       skillsArray = skills
         .split(",")
-        .map((skill) => skill.trim())
+        .map((s) => s.trim())
         .filter(Boolean);
     }
-    const userId = req.id; // Middleware Authentication
 
+    const userId = req.id;
     let user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({
-        message: "User not found",
-        success: false,
-      });
+      return res
+        .status(404)
+        .json({ message: "User not found", success: false });
     }
 
-    // updating data
+    // update fields
     if (fullname) user.fullname = fullname;
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
     if (skills) user.profile.skills = skillsArray;
+    if (cloudResponse) {
+      user.profile.resume = cloudResponse.secure_url;
+      user.profile.resumeName = file.originalname;
+    }
+
+    if (cloudResponse) {
+      // Works for PDFs
+      const inlineUrl = cloudResponse.secure_url.replace(
+        "/upload/",
+        "/upload/fl_attachment:false/"
+      );
+      user.profile.resume = inlineUrl;
+      user.profile.resumeName = file.originalname;
+    }
 
     await user.save();
-
-    user = {
-      _id: user._id,
-      fullname: user.fullname,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-      role: user.role,
-      profile: user.profile,
-    };
-
     return res.status(200).json({
-      message: "Profile Update Successfully",
-      user,
+      message: "Profile updated successfully",
+      user: {
+        _id: user._id,
+        fullname: user.fullname,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        role: user.role,
+        profile: user.profile,
+      },
       success: true,
     });
   } catch (error) {
     console.error("Error while Updating:", error.message);
-    return res.status(500).json({
-      message: "Server error during Update",
-      success: false,
-    });
+    return res.status(500).json({ message: "Server error", success: false });
   }
 };

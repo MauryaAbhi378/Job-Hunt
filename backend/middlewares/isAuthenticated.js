@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 
 const isAuthenticated = async (req, res, next) => {
   try {
-    // 🍪 Get token from cookies
     const token = req.cookies.token;
 
     if (!token) {
@@ -12,7 +11,6 @@ const isAuthenticated = async (req, res, next) => {
       });
     }
 
-    // 🔐 Verify JWT using the same secret used during login
     const decode = await jwt.verify(token, process.env.SECRET_KEY);
 
     if (!decode) {
@@ -22,10 +20,9 @@ const isAuthenticated = async (req, res, next) => {
       });
     }
 
-    // 📌 Attach user ID from token to request object for later use
     req.id = decode.userId;
 
-    next(); // ✅ Proceed to protected route
+    next(); 
   } catch (error) {
     console.log(error);
   }

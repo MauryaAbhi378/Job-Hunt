@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../layout/Navbar.jsx";
+import Navbar from "../../components/layout/Navbar.jsx";
 import { Link, useNavigate } from "react-router-dom";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -9,9 +9,11 @@ import { Button } from "@/components/ui/button";
 import { USER_API_ENDPOINT } from "../../utils/constant.js";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading } from "../../store/slice/authSlice.js";
+import { setLoading, setUser } from "../../store/slice/authSlice.js";
+import { Loader2 } from "lucide-react";
 
 const Login = () => {
+  const { user } = useSelector((store) => store.auth);
   const [input, setInput] = useState({
     email: "",
     password: "",
@@ -43,6 +45,8 @@ const Login = () => {
       });
 
       if (res.data.success) {
+        dispatch(setUser(res.data.user));
+        // console.log(res.data)
         navigate("/");
         toast.success(res.data.message);
       }
@@ -53,6 +57,12 @@ const Login = () => {
       dispatch(setLoading(false));
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  });
 
   return (
     <div>

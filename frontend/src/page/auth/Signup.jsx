@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../layout/Navbar.jsx";
+import Navbar from "../../components/layout/Navbar.jsx";
 import useDebounce from "../../hooks/useDebounce.jsx";
 import { USER_API_ENDPOINT } from "../../utils/constant.js";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { setLoading } from "../../store/slice/authSlice.js";
 import { Loader2 } from "lucide-react";
 
 const Signup = () => {
+  const { user } = useSelector((store) => store.auth);
   const [input, setInput] = useState({
     fullname: "",
     email: "",
@@ -104,6 +105,12 @@ const Signup = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  });
 
   return (
     <div>
