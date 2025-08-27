@@ -1,67 +1,73 @@
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Bookmark } from "lucide-react";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
-import Logo from "../../assets/Logo.png";
 import { useNavigate } from "react-router-dom";
+import formatCreatedAt from "../../utils/formatCreatedAt";
 
 const JobCard = ({ job }) => {
   const navigate = useNavigate();
-  const daysAgoFunction = (mongodbTime) => {
-    const createdAt = new Date(mongodbTime);
-    const currentTime = new Date();
-    const timeDifference = currentTime - createdAt;
-    return Math.floor(timeDifference / (1000 * 24 * 60 * 60));
-  };
 
   return (
-    <div className="p-5 rounded-medium shadow-xl bg-white border border-gray-100">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-500">
-          {daysAgoFunction(job?.createdAt) === 0
-            ? "Today"
-            : `${daysAgoFunction(job?.createdAt)} days ago`}
-        </p>
-        <Button variant="outline" className="rounded-full">
-          <Bookmark />
-        </Button>
+    <div
+      className="p-6 rounded-lg bg-white border border-gray-200 hover:shadow-lg transition-shadow mb-3 hover:cursor-pointer"
+      onClick={() => navigate(`/description/${job._id}`)}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-3">
+          {job?.company?.logo ? (
+            <img
+              src={job.company.logo}
+              alt="Company Logo"
+              className="w-10 h-10 object-contain"
+            />
+          ) : (
+            <div className="w-10 h-10 bg-blue-100 text-blue-600 flex items-center justify-center rounded font-bold text-sm">
+              {job?.company?.name?.[0]}
+            </div>
+          )}
+          <div>
+            <h2 className="font-bold text-lg text-gray-900">{job?.title}</h2>
+            <p className="text-sm text-gray-600">
+              {job?.company?.name} • {job?.location}
+            </p>
+          </div>
+        </div>
+        <button className="text-gray-400 hover:text-gray-600">
+          <Bookmark className="h-5 w-5" />
+        </button>
       </div>
 
-      <div className="flex items-center gap-2 my-2">
-        <Button className="p-6" variant="outline" size="icon">
-          <Avatar>
-            <AvatarImage src={job?.company?.logo || Logo} />
-          </Avatar>
-        </Button>
+      <div className="grid grid-cols-3 gap-6 mb-4">
         <div>
-          <h1 className="font-medium text-lg">{job?.company?.name}</h1>
-          <p className="text-sm text-gray-500">{job?.location}</p>
+          <p className="text-xs text-gray-500  tracking-wide mb-1">
+            Experience
+          </p>
+          {job?.experienceLevel.min === 0 && job?.experienceLevel.max === 0 ? (
+            <p>Fresher</p>
+          ) : (
+            <p className="text-sm font-medium text-gray-900">
+              {job?.experienceLevel.min} to {job?.experienceLevel.max} Years
+            </p>
+          )}
+        </div>
+        <div>
+          <p className="text-xs text-gray-500  tracking-wide mb-1">Job Type</p>
+          <p className="text-sm font-medium text-gray-900">{job?.jobType}</p>
+        </div>
+        <div>
+          <p className="text-xs text-gray-500  tracking-wide mb-1">Salary</p>
+          <p className="text-sm font-medium text-gray-900">
+            {`₹${job.salary.min / 1000}k - ₹${job.salary.max / 1000}k`}
+
+            <span className="text-xs text-gray-500 font-normal">
+              {" "}
+              per month
+            </span>
+          </p>
         </div>
       </div>
-      <div>
-        <h1 className="font-bold text-lg my-2">Title</h1>
-        <p className="text-small text-gray-600">{job?.description}</p>
-      </div>
-      <div className="flex items-center gap-2 mt-4">
-        <Badge className="text-[#F83002] font-bold" variant="ghost">
-          {job?.position} Position
-        </Badge>
-        <Badge className="text-blue-500 font-bold" variant="ghost">
-          {job?.jobType}
-        </Badge>
-        <Badge className="text-[#7209b7] font-bold" variant="ghost">
-          {job?.salary} LPA
-        </Badge>
-      </div>
-      <div className="mt-2 flex gap-2">
-        <Button
-          variant="outline"
-          onClick={() => navigate(`/description/${job._id}`)}
-        >
-          Details
-        </Button>
-        <Button variant="outline">Save for later</Button>
+
+      <div className="text-xs text-gray-500">
+        Posted {formatCreatedAt(job.createdAt)}
       </div>
     </div>
   );

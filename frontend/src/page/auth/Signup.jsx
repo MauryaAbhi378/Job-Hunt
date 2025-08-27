@@ -14,7 +14,7 @@ import { setLoading } from "../../store/slice/authSlice.js";
 import { Loader2 } from "lucide-react";
 
 const Signup = () => {
-  const { user } = useSelector((store) => store.auth);
+  const { user, loading } = useSelector((store) => store.auth);
   const [input, setInput] = useState({
     fullname: "",
     email: "",
@@ -25,7 +25,6 @@ const Signup = () => {
   });
 
   const dispatch = useDispatch();
-  const { loading } = useSelector((store) => store.auth);
   const [errors, setErrors] = useState({});
   const debouncedInput = useDebounce(input, 1000);
   const navigate = useNavigate();
@@ -67,7 +66,6 @@ const Signup = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
     if (Object.keys(errors).length > 0) {
-      console.log("Fill the form correctly");
       toast.error("Fill the form correctly");
     } else {
       const formData = new FormData();
@@ -254,6 +252,7 @@ const Signup = () => {
           ) : (
             <Button
               type="submit"
+              variant="black"
               aria-label="Create your account"
               className="w-full my-4 cursor-pointer"
             >

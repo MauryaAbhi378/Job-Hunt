@@ -28,7 +28,7 @@ const useGetAllJobs = () => {
     };
 
     fetchAllJobs(); // call once on mount
-  }, [dispatch]);
+  }, [dispatch, searchQuery]);
 };
 
 export default useGetAllJobs;

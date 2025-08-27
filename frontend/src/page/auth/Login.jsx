@@ -46,7 +46,6 @@ const Login = () => {
 
       if (res.data.success) {
         dispatch(setUser(res.data.user));
-        // console.log(res.data)
         navigate("/");
         toast.success(res.data.message);
       }
@@ -148,6 +147,7 @@ const Login = () => {
           ) : (
             <Button
               type="submit"
+              variant="black"
               aria-label="Create your account"
               className="w-full my-4 cursor-pointer"
             >

@@ -1,60 +1,57 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Navbar from "../components/layout/Navbar";
 import FilterCard from "../components/layout/FilterCard";
 import JobCard from "../components/layout/JobCard";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import JobSearch from "../components/layout/JobSearch";
+import {
+  clearjobByFilter,
+  clearJobByText,
+  fetchJobs,
+} from "../store/slice/jobSlice";
 
 const Jobs = () => {
-  const { jobs = [], searchQuery } = useSelector((store) => store.job);
-  const [filteredJobs, setFilteredJobs] = useState(jobs);
+  const { jobs = [], jobByText, loading } = useSelector((store) => store.job);
+  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (searchQuery) {
-      const search = searchQuery.toLowerCase();
-
-      const filtered = jobs.filter((job) => {
-        const title = job?.title ? job.title.toString().toLowerCase() : "";
-        const description = job?.description
-          ? job.description.toString().toLowerCase()
-          : "";
-        const location = job?.location
-          ? job.location.toString().toLowerCase()
-          : "";
-
-        return (
-          title.includes(search) ||
-          description.includes(search) ||
-          location.includes(search)
-        );
-      });
-
-      setFilteredJobs(filtered);
-    } else {
-      setFilteredJobs(jobs);
+    // console.log(jobs)
+    if (jobByText.keyword === "" || jobByText.location === "") {
+      dispatch(fetchJobs());
     }
-  }, [jobs, searchQuery]);
+  }, [dispatch, jobByText, jobs]);
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearJobByText());
+      dispatch(clearjobByFilter());
+    };
+  }, [dispatch]);
 
   return (
     <div>
       <Navbar />
+      <div className="max-w-4xl mx-auto mt-6">
+        <JobSearch />
+      </div>
       <div className="max-w-7xl mx-auto mt-5">
-        <div className="flex gap-5">
-          <div className="w-20%">
+        <div className="flex gap-25">
+          <div className="w-1/5">
             <FilterCard />
           </div>
-          {filteredJobs.length === 0 ? (
-            <span>Job Not Found</span>
-          ) : (
-            <div className="flex-1 h-[80vh] overflow-y-auto pb-6">
-              <div className="grid grid-cols-3 gap-4">
-                {filteredJobs.map((job) => (
-                  <div>
-                    <JobCard key={job._id} job={job} />
-                  </div>
+          <div className="flex-1 h-[80vh] overflow-y-auto pb-6">
+            {loading ? (
+              <span>Loading jobs...</span>
+            ) : jobs.length === 0 ? (
+              <span>No jobs found</span>
+            ) : (
+              <div className="">
+                {jobs.map((job) => (
+                  <JobCard key={job._id} job={job} />
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>

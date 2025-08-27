@@ -16,20 +16,20 @@ const jobSchema = new mongoose.Schema(
       },
     ],
     salary: {
-      type: String,
-      required: true,
+      min: { type: Number, required: true },
+      max: { type: Number, required: true },
     },
     experienceLevel: {
-      type: Number,
-      required: true,
+      min: { type: Number, required: true },
+      max: { type: Number, required: true },
     },
     location: {
       type: String,
       required: true,
     },
     jobType: {
-      type: String,
-      reuired: true,
+      type: [String],
+      required: true,
     },
     position: {
       type: Number,
@@ -54,5 +54,16 @@ const jobSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+jobSchema.methods.getExperienceLevel = function () {
+  if (this.experienceLevel.min === 0 && this.experienceLevel.max === 0) {
+    return "Fresher";
+  }
+  return `${this.experienceLevel.min} - ${this.experienceLevel.max}`;
+};
+
+jobSchema.methods.getSalary = function () {
+  return `₹${this.salary.min / 1000}K - ₹${this.salary.max / 1000}K`;
+};
 
 export const Job = mongoose.model("Job", jobSchema);

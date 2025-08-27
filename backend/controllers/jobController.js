@@ -35,8 +35,11 @@ export const postJob = async (req, res) => {
       title,
       description,
       requirements: requirements.split(","),
-      salary: Number(salary),
-      experienceLevel: experience,
+      salary: { min: salary.min, max: salary.max },
+      experienceLevel: {
+        min: experience.min,
+        max: experience.max,
+      },
       location,
       jobType,
       position,
@@ -44,9 +47,15 @@ export const postJob = async (req, res) => {
       created_by: req.id,
     });
 
+    const formatedData = {
+      ...job.toObject(),
+      experienceLevel: job.getExperienceLevel(),
+      salary: job.getSalary(),
+    };
+
     return res.status(201).json({
       message: "Job Created Successfully",
-      job,
+      job: formatedData,
       success: true,
     });
   } catch (error) {
@@ -61,26 +70,60 @@ export const postJob = async (req, res) => {
 export const getAllJobs = async (req, res) => {
   try {
     const keyword = req.query.keyword || "";
-    const query = {
-      $or: [
-        { title: { $regex: keyword, $options: "i" } },
-        { description: { $regex: keyword, $options: "i" } },
-      ],
-    };
+    const location = req.query.location || "";
+    let jobType = req.query.jobType || [];
+    let salary = req.query.salary || {};
+    const freshness = req.query.freshness || "";
+    const experienceLevel = req.query.experienceLevel || {};
+    const query = {};
 
-    const job = await Job.find(query)
+    if (keyword) {
+      query.$or = [
+        { title: { $regex: keyword, $options: "i" } },
+        { requirements: { $elemMatch: { $regex: keyword, $options: "i" } } },
+      ];
+    }
+
+    if (location) {
+      query.location = { $regex: location, $options: "i" };
+    }
+
+    if (jobType && jobType.length > 0) {
+      query.jobType = { $in: jobType };
+    }
+
+    if (salary.min || salary.max) {
+      query["salary.min"] = { $gte: salary.min };
+      query["salary.max"] = { $lte: salary.max };
+    }
+
+    if (freshness) {
+      const days = parseInt(freshness.match(/\d+/)?.[0] || "0", 10);
+      if (days > 0) {
+        const cutoffDate = new Date();
+        cutoffDate.setDate(cutoffDate.getDate() - days);
+        query.createdAt = { $gte: cutoffDate };
+      }
+    }
+
+    if (experienceLevel.min || experienceLevel.max) {
+      query["experienceLevel.max"] = { $lte: experienceLevel.max };
+    }
+
+    const jobs = await Job.find(query)
       .populate({ path: "company" })
       .sort({ createdAt: -1 });
 
-    if (!job) {
-      return res.status(404).json({
+    if (jobs.length === 0) {
+      return res.status(200).json({
         message: "Job Not Found",
-        success: false,
+        success: true,
+        job: [],
       });
     }
-    
+
     return res.status(200).json({
-      job,
+      job: jobs,
       success: true,
     });
   } catch (error) {
@@ -95,9 +138,10 @@ export const getAllJobs = async (req, res) => {
 export const getJobById = async (req, res) => {
   try {
     const jobId = req.params.id;
-    const job = await Job.findById(jobId).populate({
-      path: "applications",
-    });
+    const job = await Job.findById(jobId).populate([
+      { path: "company" },
+      { path: "applications" },
+    ]);
     if (!job) {
       return res.status(404).json({
         message: "Job Not Found",

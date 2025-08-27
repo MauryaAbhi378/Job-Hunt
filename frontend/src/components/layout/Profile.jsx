@@ -11,7 +11,7 @@ import UpdateProfileDialog from "./UpdateProfileDialog.jsx";
 import useGetAppliedJob from "../../hooks/useGetAppliedJob.jsx";
 
 const Profile = () => {
-  useGetAppliedJob()
+  useGetAppliedJob();
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
   const isResume = Boolean(user?.profile?.resume);
@@ -23,7 +23,9 @@ const Profile = () => {
           <div className="flex items-center gap-4">
             <Avatar className="h-24 w-24">
               <AvatarImage
-                src={ user?.profile?.profilePhoto ||"https://github.com/shadcn.png"}
+                src={
+                  user?.profile?.profilePhoto || "https://github.com/shadcn.png"
+                }
                 alt="profile"
               />
             </Avatar>
@@ -55,7 +57,7 @@ const Profile = () => {
           <div className="flex items-center gap-1">
             {user?.profile?.skills.length !== 0 ? (
               user?.profile?.skills.map((item, index) => (
-                <Badge key={index}>{item}</Badge>
+                <Badge variant="white" key={index}>{item}</Badge>
               ))
             ) : (
               <span>NA</span>
@@ -68,7 +70,10 @@ const Profile = () => {
             <a
               target="_blank"
               rel="noopener noreferrer"
-              href={user?.profile?.resume}
+              href={user?.profile?.resume.replace(
+                "/upload/",
+                "/upload/fl_inline/"
+              )}
             >
               {user?.profile?.resumeName}
             </a>

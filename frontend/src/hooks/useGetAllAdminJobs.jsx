@@ -14,6 +14,7 @@ const useGetAllAdminJobs = () => {
           withCredentials: true,
         });
 
+        // console.log(res.data)
         if (res.data.success) {
           dispatch(setAdminJobs(res.data.jobs));
         }

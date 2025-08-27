@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
+import path from "path";
 
 export const register = async (req, res) => {
   try {
@@ -14,11 +15,11 @@ export const register = async (req, res) => {
       });
     }
 
-    const file = req.file;
-    let cloudResponse
-    if (file) {
+    let profilePhotoUrl = null;
+    if (req.file) {
       const fileUri = getDataUri(file);
-      cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      profilePhotoUrl = cloudResponse.secure_url;
     }
 
     const user = await User.findOne({ email });
@@ -37,7 +38,7 @@ export const register = async (req, res) => {
       phoneNumber,
       role,
       profile: {
-        profilePhoto: cloudResponse.secure_url || null,
+        profilePhoto: profilePhotoUrl,
       },
     });
 
@@ -92,12 +93,10 @@ export const login = async (req, res) => {
       userId: user._id,
     };
 
-    // 🔐 Sign JWT using secret key and set expiration (1 day)
     const token = await jwt.sign(tokenData, process.env.SECRET_KEY, {
       expiresIn: "1d",
     });
 
-    // 🧼 Remove sensitive info before sending user object
     user = {
       _id: user._id,
       fullname: user.fullname,
@@ -106,8 +105,6 @@ export const login = async (req, res) => {
       role: user.role,
       profile: user.profile,
     };
-
-    console.log(user.role)
     // 🍪 Set token in HTTP-only cookie for client storage
     return res
       .status(201)
@@ -153,13 +150,21 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-    const file = req.file;
 
+    const file = req.file;
     let cloudResponse;
+
     if (file) {
       const fileUri = getDataUri(file);
+      console.log("DataURI Preview:", fileUri.content.substring(0, 50));
+
+      const ext = path.extname(file.originalname); // preserve .pdf
+      const baseName = path.basename(file.originalname, ext);
+
       cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        resource_type: "auto",
+        resource_type: "raw",
+        folder: "user_profiles",
+        public_id: `${Date.now()}-${baseName}${ext}`, // keep extension
         use_filename: true,
         unique_filename: false,
       });
@@ -186,23 +191,19 @@ export const updateProfile = async (req, res) => {
     if (email) user.email = email;
     if (phoneNumber) user.phoneNumber = phoneNumber;
     if (bio) user.profile.bio = bio;
-    if (skills) user.profile.skills = skillsArray;
-    if (cloudResponse) {
-      user.profile.resume = cloudResponse.secure_url;
-      user.profile.resumeName = file.originalname;
-    }
+    if (skillsArray) user.profile.skills = skillsArray;
 
     if (cloudResponse) {
-      // Works for PDFs
-      const inlineUrl = cloudResponse.secure_url.replace(
-        "/upload/",
-        "/upload/fl_attachment:false/"
-      );
+      // build proper inline preview URL
+      const inlineUrl = `https://res.cloudinary.com/dgo4t2vuf/raw/upload/fl_inline/${cloudResponse.public_id}.${cloudResponse.format}`;
+
       user.profile.resume = inlineUrl;
+      user.profile.resumeDownload = cloudResponse.secure_url;
       user.profile.resumeName = file.originalname;
     }
 
     await user.save();
+
     return res.status(200).json({
       message: "Profile updated successfully",
       user: {

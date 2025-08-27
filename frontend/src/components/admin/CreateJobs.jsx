@@ -17,32 +17,52 @@ import { setLoading } from "../../store/slice/authSlice";
 import axios from "axios";
 import { JOB_API_ENDPOINT } from "../../utils/constant";
 import { useNavigate } from "react-router-dom";
+import { Slider } from "@/components/ui/slider";
+import { Loader2 } from "lucide-react";
 
 const CreateJobs = () => {
   const { companies } = useSelector((store) => store.company);
   const { loading } = useSelector((store) => store.auth);
+
   const [input, setInput] = useState({
     title: "",
     description: "",
     requirements: "",
-    salary: "",
+    salary: [0, 15000],
+    experience: [0, 1],
     location: "",
     jobType: "",
-    experience: "",
     position: 0,
     companyId: "",
   });
+
   const navigate = useNavigate();
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
   };
 
+  const handleSalaryChange = (value) => {
+    setInput({ ...input, salary: value });
+  };
+
+  const handleExperienceChange = (value) => {
+    setInput({ ...input, experience: value });
+  };
+
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await axios.post(`${JOB_API_ENDPOINT}/post`, input, {
+      const payload = {
+        ...input,
+        salary: { min: input.salary[0], max: input.salary[1] },
+        experience: {
+          min: input.experience[0],
+          max: input.experience[1],
+        },
+      };
+      const res = await axios.post(`${JOB_API_ENDPOINT}/post`, payload, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -65,6 +85,7 @@ const CreateJobs = () => {
     );
     setInput({ ...input, companyId: selectedCompany._id });
   };
+
   return (
     <div>
       <Navbar />
@@ -104,16 +125,18 @@ const CreateJobs = () => {
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
             </div>
+
             <div>
-              <Label>Salary</Label>
+              <Label>No of Position</Label>
               <Input
-                type="text"
-                name="salary"
-                value={input.salary}
+                type="number"
+                name="position"
+                value={input.position}
                 onChange={changeEventHandler}
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
             </div>
+
             <div>
               <Label>Location</Label>
               <Input
@@ -134,26 +157,43 @@ const CreateJobs = () => {
                 className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
               />
             </div>
+
+            {/* Experience Slider */}
             <div>
-              <Label>Experience Level</Label>
-              <Input
-                type="text"
-                name="experience"
+              <Label className="mb-4">Experience (years)</Label>
+              <Slider
                 value={input.experience}
-                onChange={changeEventHandler}
-                className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
+                min={0}
+                max={20}
+                step={1}
+                className="w-[300px] mb-3"
+                onValueChange={handleExperienceChange}
               />
+              {input.experience[0] === 0 && input.experience[1] === 0 ? (
+                <p>Fresher</p>
+              ) : (
+                <p>
+                  {input.experience[0]} - {input.experience[1]} years
+                </p>
+              )}
             </div>
+
             <div>
-              <Label>No of Postion</Label>
-              <Input
-                type="number"
-                name="position"
-                value={input.position}
-                onChange={changeEventHandler}
-                className="focus-visible:ring-offset-0 focus-visible:ring-0 my-1"
+              <Label className="mb-4">Salary Range (₹)</Label>
+              <Slider
+                value={input.salary}
+                min={5000}
+                max={250000}
+                step={1500}
+                className="w-[300px] mb-3"
+                onValueChange={handleSalaryChange}
               />
+              <p>
+                ₹{input.salary[0]} - ₹{input.salary[1]}{" "}
+                <span className="text-sm text-gray-400">per month</span>
+              </p>
             </div>
+
             {companies.length > 0 && (
               <Select onValueChange={selectChangeHandler}>
                 <SelectTrigger className="w-[180px]">
@@ -164,6 +204,7 @@ const CreateJobs = () => {
                     {companies.map((company) => {
                       return (
                         <SelectItem
+                          key={company._id}
                           value={company?.name?.toLowerCase()}
                         >
                           {company.name}
@@ -175,19 +216,20 @@ const CreateJobs = () => {
               </Select>
             )}
           </div>
+
           {loading ? (
-            <Button className="w-full my-4">
-              {" "}
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait{" "}
+            <Button className="w-full my-4" disabled>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait
             </Button>
           ) : (
             <Button type="submit" className="w-full my-4">
               Post New Job
             </Button>
           )}
+
           {companies.length === 0 && (
             <p className="text-xs text-red-600 font-bold text-center my-3">
-              *Please register a company first, before posting a jobs
+              *Please register a company first, before posting a job
             </p>
           )}
         </form>

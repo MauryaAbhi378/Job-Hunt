@@ -41,7 +41,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
         <div>
           <h1 className="text-2xl font-bold">
-            Job <span className="text-[#F83002]">Hunt</span>
+            Job<span className="text-blue-500">Hunt</span>
           </h1>
         </div>
         <div className="flex items-center gap-12">
@@ -61,11 +61,11 @@ const Navbar = () => {
                   <Link to="/">Home</Link>
                 </li>
                 <li>
-                  <Link to="/jobs">Jobs</Link>
+                  <Link to="/jobs">Find Job</Link>
                 </li>
-                <li>
+                {/* <li>
                   <Link to="/browse">Browse</Link>
-                </li>
+                </li> */}
               </>
             )}
           </ul>
@@ -74,7 +74,7 @@ const Navbar = () => {
               <Button variant="outline" className="cursor-pointer">
                 <Link to="/login">Login</Link>
               </Button>
-              <Button className="bg-[#f54721] hover:bg-[#F83002] cursor-pointer">
+              <Button className="bg-blue-500 hover:bg-blue-600 cursor-pointer">
                 <Link to="/signup">SignUp</Link>
               </Button>
             </div>

@@ -18,25 +18,25 @@ import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const AdminJobsTable = () => {
-  const { allAdminJobs = [], searchJobByText } = useSelector(
-    (store) => store.job
-  );
+  const { allAdminJobs = [], searchQuery } = useSelector((store) => store.job);
   const navigate = useNavigate();
-  const [filterJobs, setFilterJobs] = useState(allAdminJobs);
+  const [filterJobs, setFilterJobs] = useState([]);
 
   useEffect(() => {
-    const filteredJobs = allAdminJobs.filter((job) => {
-      if (!searchJobByText) return true;
-
+    // console.log(allAdminJobs)
+    if (!searchQuery) {
+      setFilterJobs(allAdminJobs);
+      return;
+    }
+    console.log(searchQuery);
+    const filtered = allAdminJobs.filter((job) => {
       return (
-        job?.title?.toLowerCase().includes(searchJobByText.toLowerCase()) ||
-        job?.company?.name
-          ?.toLowerCase()
-          .includes(searchJobByText.toLowerCase())
+        job?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job?.company?.name?.toLowerCase().includes(searchQuery.toLowerCase())
       );
     });
-    setFilterJobs(filteredJobs);
-  }, [allAdminJobs, searchJobByText]);
+    setFilterJobs(filtered);
+  }, [allAdminJobs, searchQuery]);
 
   return (
     <div>
