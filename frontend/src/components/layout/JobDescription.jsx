@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../layout/Navbar.jsx";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -58,7 +57,6 @@ const JobDescription = () => {
           withCredentials: true,
         });
         if (res.data.success) {
-          // console.log(res.data)
           dispatch(setSingleJob(res.data.job));
           setIsApplied(
             res.data.job.applications.some(
@@ -87,18 +85,19 @@ const JobDescription = () => {
                     {singleJob?.company?.name || "Company"}
                   </p>
                 </div>
-                <Avatar className="w-16 h-16 rounded-sm">
+                <div className="w-16 h-16 rounded-sm">
                   {singleJob?.company?.logo ? (
-                    <AvatarImage
+                    <img
+                      className="w-14 h-14"
                       src={singleJob.company.logo}
                       alt={singleJob.company.name}
                     />
                   ) : (
-                    <div className="w-16 h-16 flex items-center justify-center bg-blue-100 text-blue-600 rounded-sm font-bold text-2xl">
+                    <div className="w-14 h-14 flex items-center justify-center bg-blue-100 text-blue-600 rounded-sm font-bold text-2xl">
                       {singleJob?.company?.name?.[0]?.toUpperCase()}
                     </div>
                   )}
-                </Avatar>
+                </div>
               </div>
 
               <div className="flex flex-col flex-wrap gap-2 text-gray-700 text-md mt-4">
@@ -150,17 +149,19 @@ const JobDescription = () => {
                 </div>
 
                 <div className="flex justify-end gap-3">
-                  <Button
-                    onClick={isApplied ? null : applyJobHandler}
-                    disabled={isApplied}
-                    className={`rounded-full px-6 ${
-                      isApplied
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
-                    }`}
-                  >
-                    {isApplied ? "Already Applied" : "Apply"}
-                  </Button>
+                  {user.role === "Student" && (
+                    <Button
+                      onClick={isApplied ? null : applyJobHandler}
+                      disabled={isApplied}
+                      className={`rounded-full px-6 ${
+                        isApplied
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                    >
+                      {isApplied ? "Already Applied" : "Apply"}
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -189,7 +190,9 @@ const JobDescription = () => {
 
           {/* Right Side - Related Jobs */}
           <div>
-            <RelatedJobs currentJobId={jobId} title={singleJob?.title} />
+            {user.role === "Student" && (
+              <RelatedJobs currentJobId={jobId} title={singleJob?.title} />
+            )}
           </div>
         </div>
       </div>

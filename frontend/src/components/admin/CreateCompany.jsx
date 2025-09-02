@@ -65,7 +65,7 @@ const CreateCompany = () => {
           >
             Cancel
           </Button>
-          <Button onClick={registerNewCompany}>Continue</Button>
+          <Button variant="black"  onClick={registerNewCompany}>Continue</Button>
         </div>
       </div>
     </div>

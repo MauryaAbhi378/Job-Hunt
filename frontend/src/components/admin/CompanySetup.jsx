@@ -13,6 +13,8 @@ import { COMPANIES_API_ENDPOINT } from "../../utils/constant";
 import useGetCompanyById from "../../hooks/useGetCompanyById";
 
 const CompanySetup = () => {
+  const { loading } = useSelector((store) => store.auth);
+  const {singleCompany} = useSelector(store => store.company)
   const [input, setInput] = useState({
     name: "",
     description: "",
@@ -20,12 +22,10 @@ const CompanySetup = () => {
     location: "",
     file: null,
   });
-  const { loading } = useSelector((store) => store.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
   useGetCompanyById(params.id)
-  const {singleCompany} = useSelector(store => store.company)
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -150,7 +150,7 @@ const CompanySetup = () => {
               <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait{" "}
             </Button>
           ) : (
-            <Button type="submit" className="w-full my-4">
+            <Button type="submit" variant="black" className="w-full my-4">
               Update
             </Button>
           )}

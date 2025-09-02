@@ -15,7 +15,6 @@ const AdminJobs = () => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    // console.log(useGetAllAdminJobs)
     dispatch(setSearchQuery(input))
   }, [input, dispatch])
   return (
@@ -28,7 +27,7 @@ const AdminJobs = () => {
             placeholder="Filter by name, role"
             onChange={(e) => setInput(e.target.value)}
           />
-          <Button onClick={() => navigate("/admin/jobs/create")}>
+          <Button variant="black" onClick={() => navigate("/admin/jobs/create")}>
             New Jobs
           </Button>
         </div>

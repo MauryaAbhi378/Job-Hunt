@@ -8,7 +8,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import {
   Popover,
   PopoverContent,
@@ -50,9 +49,19 @@ const CompaniesTable = () => {
           {filterCompany?.map((company) => (
             <tr key={company._id}>
               <TableCell>
-                <Avatar>
-                  <AvatarImage src={company.logo} />
-                </Avatar>
+                <div className="flex flex-row items-center gap-6">
+                  {company?.logo ? (
+                    <img
+                      src={company?.logo}
+                      alt="Company Logo"
+                      className="w-10 h-10 object-contain rounded-md"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 bg-blue-200 text-blue-600 flex items-center justify-center rounded-md font-bold text-lg">
+                      {company?.name?.[0] || "C"}{" "}
+                    </div>
+                  )}
+                </div>
               </TableCell>
               <TableCell>{company.name}</TableCell>
               <TableCell>{company.createdAt.split("T")[0]}</TableCell>

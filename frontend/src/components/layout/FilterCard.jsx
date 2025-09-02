@@ -14,15 +14,17 @@ import { Slider } from "@/components/ui/slider";
 
 const Filter = () => {
   const {
-    jobs = [],
     filters = {},
     jobByText,
+    page = 1,
+    limit = 3,
+    totalJob,
   } = useSelector((store) => store.job);
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(fetchJobs({ jobByText, filters }));
-  }, [filters, dispatch, jobByText]);
+    dispatch(fetchJobs({ page, limit, jobByText, filters }));
+  }, [filters, dispatch]);
 
   const clearAll = () => {
     dispatch(
@@ -147,7 +149,7 @@ const Filter = () => {
           >
             Clear All
           </button>
-          <p className="text-gray-600 text-xs font-semibold">{jobs.length}</p>
+          <p className="text-gray-600 text-xs font-semibold">{totalJob}</p>
         </div>
       </div>
 
@@ -221,7 +223,7 @@ const Filter = () => {
                         }% - 10px)`,
                       }}
                     >
-                      {filters.experienceLevel?.min}
+                      {filters.experienceLevel?.max}
                     </div>
                   </div>
 

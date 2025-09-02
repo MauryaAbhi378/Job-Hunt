@@ -2,14 +2,24 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import loupe from "../../assets/loupe.png";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchJobs, setJobByText } from "../../store/slice/jobSlice";
+import { clearPage, fetchJobs, setJobByText } from "../../store/slice/jobSlice";
 
 function JobSearch() {
-  const { jobByText, filters } = useSelector((store) => store.job);
+  const {
+    jobByText,
+    filters,
+    page = 1,
+    limit = 3,
+  } = useSelector((store) => store.job);
   const dispatch = useDispatch();
 
-  const searchHandler = async () => {
-    dispatch(fetchJobs({ jobByText, filters }));
+  const searchHandler = () => {
+    if (page > 1) {
+      dispatch(clearPage());
+      dispatch(fetchJobs({ page, limit, jobByText, filters }));
+    } else {
+      dispatch(fetchJobs({ page, limit, jobByText, filters }));
+    }
   };
 
   return (

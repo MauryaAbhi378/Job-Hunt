@@ -10,13 +10,15 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const AppliedJob = () => {
   const { appliedJobs = [] } = useSelector((store) => store.job);
+  const navigate = useNavigate();
 
   return (
     <div>
-      <Table>
+      <Table className="hover:cursor-pointer">
         <TableCaption>A list of your applied jobs</TableCaption>
         <TableHeader>
           <TableRow>
@@ -31,7 +33,10 @@ const AppliedJob = () => {
             <span>You haven't applied any job yet.</span>
           ) : (
             appliedJobs.map((appliedJob) => (
-              <TableRow key={appliedJob._id}>
+              <TableRow
+                key={appliedJob._id}
+                onClick={() => navigate(`/description/${appliedJob.job._id}`)}
+              >
                 <TableCell>{appliedJob?.createdAt?.split("T")[0]}</TableCell>
                 <TableCell>{appliedJob.job?.title}</TableCell>
                 <TableCell>{appliedJob.job?.company?.name}</TableCell>

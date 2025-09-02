@@ -43,21 +43,23 @@ const Profile = () => {
           </Button>
         </div>
         <div className="my-5">
-          <div className="flex items-center gap-3 my-2">
+          <div className="flex items-center gap-3 mb-2">
             <Mail />
             <span>{user?.email}</span>
           </div>
-          <div className="flex items-center gap-3 my-2">
+          <div className="flex items-center gap-3">
             <Contact />
             <span>{user?.phoneNumber}</span>
           </div>
         </div>
         <div className="my-5">
           <h1>Skills</h1>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center mt-2 gap-2">
             {user?.profile?.skills.length !== 0 ? (
               user?.profile?.skills.map((item, index) => (
-                <Badge variant="white" key={index}>{item}</Badge>
+                <Badge variant="white" key={index}>
+                  {item}
+                </Badge>
               ))
             ) : (
               <span>NA</span>

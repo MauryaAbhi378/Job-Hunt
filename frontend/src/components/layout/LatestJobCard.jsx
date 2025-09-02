@@ -7,27 +7,27 @@ const LatestJobCard = ({ job }) => {
   return (
     <div
       onClick={() => navigate(`/description/${job._id}`)}
-      className="p-5 rounded-2xl shadow-md hover:shadow-lg cursor-pointer bg-white border border-gray-100 flex flex-col justify-between h-full hover:bg-blue-100 transition-all duration-500 ease-out"
+      className="p-5 rounded-2xl shadow-md hover:shadow-lg cursor-pointer bg-white border border-gray-100 flex flex-col justify-between h-full"
     >
       <div className="flex flex-row items-center gap-6">
         {job?.company?.logo ? (
           <img
             src={job.company.logo}
             alt="Company Logo"
-            className="w-16 h-16 object-contain rounded-md"
+            className="w-10 h-10 object-contain rounded-md"
           />
         ) : (
-          <div className="w-16 h-16 bg-blue-200 text-blue-600 flex items-center justify-center rounded-md font-bold text-2xl">
+          <div className="w-13 h-13 bg-blue-200 text-blue-600 flex items-center justify-center rounded-md font-bold text-xl">
             {job?.company?.name?.[0] || "C"}{" "}
           </div>
         )}
-        <div>
+        <div className="flex flex-col items-start">
           <h2 className="font-bold text-xl">{job?.company?.name}</h2>
           <p className="text-sm text-gray-600">{job?.location}</p>
         </div>
       </div>
 
-      <div className="mt-4">
+      <div className="mt-4 flex flex-col text-left">
         <h1 className="font-bold text-xl">{job?.title}</h1>
         <p className="text-sm text-gray-600 mt-2 line-clamp-3">
           {job?.description}

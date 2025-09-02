@@ -84,6 +84,15 @@ function App() {
       ),
     },
     {
+      path: "/admin/job/update/:id", 
+      element: (
+        <ProtectedRoute>
+          <CreateJobs />
+        </ProtectedRoute>
+      ),
+    },
+
+    {
       path: "/admin/jobs/:id/applicants",
       element: (
         <ProtectedRoute>

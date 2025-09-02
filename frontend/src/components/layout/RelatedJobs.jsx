@@ -10,12 +10,16 @@ const RelatedJobs = ({ currentJobId, title }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // console.log(jobs)
-    const related = jobs.filter((job) => {
-      if (job._id !== currentJobId && job.title === title) {
-        return job;
-      }
-    });
+    const isSimilarities = (jobTitle, searchTitle) => {
+      const jobWord = jobTitle.split(" ")[0];
+      const searchWord = searchTitle.split(" ")[0];
+      return jobWord.toLowerCase() === searchWord.toLowerCase();
+    };
+
+    const related = jobs.filter(
+      (job) => job._id !== currentJobId && isSimilarities(job.title, title)
+    );
+
     setRelatedJobs(related.slice(0, 3));
   }, [currentJobId, title, jobs]);
 
@@ -37,9 +41,7 @@ const RelatedJobs = ({ currentJobId, title }) => {
                 <div className="flex justify-between items-center">
                   <div>
                     <h3 className="font-semibold text- text-lg">{job.title}</h3>
-                    <p className="text-sm text-gray-600">
-                      {job.company.name}
-                    </p>
+                    <p className="text-sm text-gray-600">{job.company.name}</p>
                   </div>
                   {job?.company?.logo ? (
                     <img

@@ -1,12 +1,12 @@
 import Navbar from "../components/layout/Navbar.jsx";
 import HeroSection from "../components/layout/HeroSection.jsx";
-// import CategoryCarousel from "../components/layout/CategoryCarousel.jsx";
-import LatestJob from "../components/layout/LatestJob.jsx";
 import Footer from "../components/layout/Footer.jsx";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useGetAllJobs from "../hooks/useGetAllJobs.jsx"
+import JobsByCategory from "../components/layout/JobsByCategory.jsx";
+import Review from "../components/layout/Review.jsx";
 
 const Home = () => {
   useGetAllJobs()
@@ -21,7 +21,8 @@ const Home = () => {
     <div>
       <Navbar />
       <HeroSection />
-      <LatestJob />
+      <JobsByCategory/>
+      <Review/>
       <Footer />
     </div>
   );

@@ -4,10 +4,12 @@ import { JOB_API_ENDPOINT } from "../../utils/constant";
 
 export const fetchJobs = createAsyncThunk(
   "job/fetchJobs",
-  async ({ jobByText, filters }) => {
+  async ({ page, limit, jobByText, filters }) => {
     const params = {
       keyword: jobByText.keyword,
       location: jobByText.location,
+      page: page,
+      limit: limit,
     };
 
     if (filters.freshness) {
@@ -18,7 +20,7 @@ export const fetchJobs = createAsyncThunk(
         max: filters.experienceLevel.max,
       };
     }
-    if (filters.salary?.min > 0 || filters.salary?.max > 0) {
+    if (filters.salary?.min || filters.salary?.max) {
       params.salary = {
         min: filters.salary.min,
         max: filters.salary.max,
@@ -32,14 +34,32 @@ export const fetchJobs = createAsyncThunk(
       params,
       withCredentials: true,
     });
-    return res.data.success ? res.data.job : [];
+    if (res.data.success) {
+      return {
+        job: res.data.job,
+        totalJob: res.data.totalJob,
+        totalPage: res.data.totalPage,
+      };
+    } else {
+      return {
+        job: [],
+        totalJob: 0,
+        totalPage: 0,
+      };
+    }
   }
 );
 
 const jobSlice = createSlice({
   name: "job",
   initialState: {
+    loading: false,
     jobs: [],
+    page: 1,
+    limit: 3,
+    totalJob: 0,
+    totalPage: 0,
+    category: "",
     singleJob: null,
     jobByText: {
       keyword: "",
@@ -58,6 +78,9 @@ const jobSlice = createSlice({
   reducers: {
     setJob: (state, action) => {
       state.jobs = action.payload;
+    },
+    setPage: (state, action) => {
+      state.page = action.payload;
     },
     setSingleJob: (state, action) => {
       state.singleJob = action.payload;
@@ -91,6 +114,9 @@ const jobSlice = createSlice({
         freshness: "",
       };
     },
+    clearPage : (state) => {
+      state.page = 1
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -100,7 +126,9 @@ const jobSlice = createSlice({
       })
       .addCase(fetchJobs.fulfilled, (state, action) => {
         state.loading = false;
-        state.jobs = action.payload;
+        state.jobs = action.payload.job;
+        (state.totalJob = action.payload.totalJob),
+          (state.totalPage = action.payload.totalPage);
       })
       .addCase(fetchJobs.rejected, (state, action) => {
         state.loading = false;
@@ -111,6 +139,7 @@ const jobSlice = createSlice({
 
 export const {
   setJob,
+  setPage,
   setSingleJob,
   setAdminJobs,
   setAppliedJobs,
@@ -119,5 +148,6 @@ export const {
   setFilters,
   clearJobByText,
   clearjobByFilter,
+  clearPage
 } = jobSlice.actions;
 export default jobSlice.reducer;

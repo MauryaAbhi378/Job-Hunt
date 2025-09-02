@@ -4,6 +4,7 @@ export const postJob = async (req, res) => {
   try {
     const {
       title,
+      category,
       description,
       requirements,
       location,
@@ -16,6 +17,7 @@ export const postJob = async (req, res) => {
 
     if (
       !title ||
+      !category ||
       !description ||
       !requirements ||
       !salary ||
@@ -33,6 +35,7 @@ export const postJob = async (req, res) => {
 
     const job = await Job.create({
       title,
+      category,
       description,
       requirements: requirements.split(","),
       salary: { min: salary.min, max: salary.max },
@@ -75,6 +78,9 @@ export const getAllJobs = async (req, res) => {
     let salary = req.query.salary || {};
     const freshness = req.query.freshness || "";
     const experienceLevel = req.query.experienceLevel || {};
+    const page = Number(req.query.page) || 0;
+    const limit = Number(req.query.limit) || 0;
+
     const query = {};
 
     if (keyword) {
@@ -93,7 +99,6 @@ export const getAllJobs = async (req, res) => {
     }
 
     if (salary.min || salary.max) {
-      query["salary.min"] = { $gte: salary.min };
       query["salary.max"] = { $lte: salary.max };
     }
 
@@ -111,8 +116,12 @@ export const getAllJobs = async (req, res) => {
     }
 
     const jobs = await Job.find(query)
+      .skip((page - 1) * limit)
+      .limit(limit)
       .populate({ path: "company" })
       .sort({ createdAt: -1 });
+
+    const totalJob = await Job.countDocuments(query);
 
     if (jobs.length === 0) {
       return res.status(200).json({
@@ -124,6 +133,8 @@ export const getAllJobs = async (req, res) => {
 
     return res.status(200).json({
       job: jobs,
+      totalJob,
+      totalPage: Math.ceil(totalJob / limit),
       success: true,
     });
   } catch (error) {
@@ -157,6 +168,64 @@ export const getJobById = async (req, res) => {
     console.error("Error during finding job by Id:", error.message);
     return res.status(500).json({
       message: "Server error during finding job by Id",
+      success: false,
+    });
+  }
+};
+
+export const updateJob = async (req, res) => {
+  try {
+    const {
+      title,
+      category,
+      description,
+      requirements,
+      location,
+      experience,
+      salary,
+      jobType,
+      position,
+      companyId,
+    } = req.body;
+
+    let updatedData = {};
+    if (title !== undefined) updatedData.title = title;
+    if (category !== undefined) updatedData.category = category;
+    if (description !== undefined) updatedData.description = description;
+    if (requirements !== undefined) updatedData.requirements = requirements;
+    if (location !== undefined) updatedData.location = location;
+    if (experience !== undefined) updatedData.experience = experience;
+    if (salary !== undefined) updatedData.salary = salary;
+    if (jobType !== undefined) updatedData.jobType = jobType;
+    if (position !== undefined) updatedData.position = position;
+    if (companyId !== undefined) updatedData.companyId = companyId;
+
+    if (Object.keys(updatedData).length === 0) {
+      return res.status(400).json({
+        message: "No fields provided to update.",
+        success: false,
+      });
+    }
+
+    const job = await Job.findByIdAndUpdate(req.params.id, updatedData, {
+      new: true,
+    });
+
+    if (!job) {
+      return res.status(400).json({
+        message: "Job Not Found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Job Updated",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error during Updating Job:", error.message);
+    return res.status(500).json({
+      message: "Server error during Updating Job",
       success: false,
     });
   }
