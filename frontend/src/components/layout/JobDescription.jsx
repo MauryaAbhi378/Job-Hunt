@@ -51,6 +51,7 @@ const JobDescription = () => {
   };
 
   useEffect(() => {
+    console.log(user.role)
     const fetchSingleJob = async () => {
       try {
         const res = await axios.get(`${JOB_API_ENDPOINT}/get/${jobId}`, {
@@ -149,7 +150,7 @@ const JobDescription = () => {
                 </div>
 
                 <div className="flex justify-end gap-3">
-                  {user.role === "Student" && (
+                  {user.role === "student" && (
                     <Button
                       onClick={isApplied ? null : applyJobHandler}
                       disabled={isApplied}
@@ -190,7 +191,7 @@ const JobDescription = () => {
 
           {/* Right Side - Related Jobs */}
           <div>
-            {user.role === "Student" && (
+            {user.role === "student" && (
               <RelatedJobs currentJobId={jobId} title={singleJob?.title} />
             )}
           </div>
