@@ -30,7 +30,7 @@ app.use(cookieParser());
 
 // CORS configuration object to allow frontend at localhost:5173 to communicate with the backend
 const corsOption = {
-  origin: "http://localhost:5173", // Allow requests only from this origin (your React app)
+  origin: "https://job-hunt-yjwx.onrender.com", // Allow requests only from this origin (your React app)
   credentials: true, // Allow sending of cookies and HTTP authentication
 };
 
