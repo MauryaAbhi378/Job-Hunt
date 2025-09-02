@@ -8,9 +8,12 @@ import userRoute from "./routes/userRoute.js";
 import companyRoute from "./routes/companyRoute.js";
 import jobRouter from "./routes/jobRoute.js";
 import applicationRoute from "./routes/applicationRoute.js";
+import path from "path"
 
 dotenv.config();
 const app = express();
+const PORT = process.env.PORT || 3000;
+const __dirname = path.resolve()
 
 //To parse array
 app.set("query parser", (str) => {
@@ -39,7 +42,12 @@ app.use("/api/company", companyRoute);
 app.use("/api/job", jobRouter);
 app.use("/api/application", applicationRoute);
 
-const PORT = process.env.PORT || 3000;
+app.use(express.static(path.resolve(__dirname, "frontend", "dist")));
+
+app.get(/.*/, (_, res) => {
+  res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+});
+
 app.listen(PORT, () => {
   connectDB();
   console.log(`Sever running on PORT : ${PORT}`);
