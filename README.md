@@ -4,7 +4,11 @@ A full-stack job portal where job seekers can explore opportunities and apply fo
 and efficient job search with filters for categories, location, and experience.
 
 Key Features:
+
 👨‍💼 Employer dashboard for posting & managing jobs
+
 👩‍💻 Job seeker dashboard for applying & tracking applications
+
 🔍 Advanced job search with filters (role, location, salary, etc.)
+
 🔐 Secure authentication & role-based access 
