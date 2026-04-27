@@ -5,6 +5,10 @@ const authSlice = createSlice({
   initialState: {
     loading: false,
     user: null,
+    onboardingStatus: {
+      isCompleted: true,
+      companyId: null,
+    },
   },
   reducers: {
     setLoading: (state, action) => {
@@ -13,8 +17,11 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
+    setOnboardingStatus: (state, action) => {
+      state.onboardingStatus = action.payload;
+    },
   },
 });
 
-export const { setLoading, setUser } = authSlice.actions;
+export const { setLoading, setUser, setOnboardingStatus } = authSlice.actions;
 export default authSlice.reducer;

@@ -1,4 +1,5 @@
 import { User } from "../models/userModel.js";
+import { Company } from "../models/companyModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
@@ -88,6 +89,18 @@ export const login = async (req, res) => {
       });
     }
 
+    // Check onboarding status for recruiters
+    let onboardingStatus = {
+      isCompleted: true,
+      companyId: null,
+    };
+
+    if (user.role.toLowerCase() === "recruiter") {
+      const company = await Company.findOne({ userId: user._id });
+      onboardingStatus.isCompleted = company?.onboarding || false;
+      onboardingStatus.companyId = company?._id || null;
+    }
+
     // 🛡️ Create JWT payload with user ID
     const tokenData = {
       userId: user._id,
@@ -116,6 +129,7 @@ export const login = async (req, res) => {
       .json({
         message: `Welcome back ${user.fullname}`,
         user,
+        onboardingStatus,
         success: true,
       });
   } catch (error) {

@@ -24,7 +24,7 @@ const Filter = () => {
 
   useEffect(() => {
     dispatch(fetchJobs({ page, limit, jobByText, filters }));
-  }, [filters, dispatch, page, limit]);
+  }, [filters, dispatch]);
 
   const clearAll = () => {
     dispatch(

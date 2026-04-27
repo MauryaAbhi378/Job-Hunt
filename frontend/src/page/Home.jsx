@@ -21,8 +21,8 @@ const Home = () => {
     <div>
       <Navbar />
       <HeroSection />
-      <JobsByCategory/>
-      <Review/>
+      {/* <JobsByCategory/>
+      <Review/> */}
       <Footer />
     </div>
   );

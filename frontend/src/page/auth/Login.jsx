@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { USER_API_ENDPOINT } from "../../utils/constant.js";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { setLoading, setUser } from "../../store/slice/authSlice.js";
+import { setLoading, setUser, setOnboardingStatus } from "../../store/slice/authSlice.js";
 import { Loader2 } from "lucide-react";
 
 const Login = () => {
@@ -46,6 +46,22 @@ const Login = () => {
 
       if (res.data.success) {
         dispatch(setUser(res.data.user));
+        
+        // Set onboarding status if available
+        if (res.data.onboardingStatus) {
+          dispatch(setOnboardingStatus(res.data.onboardingStatus));
+          
+          // If recruiter hasn't completed onboarding, redirect to onboarding page
+          if (
+            res.data.user.role?.toLowerCase() === "recruiter" &&
+            !res.data.onboardingStatus.isCompleted
+          ) {
+            navigate("/onboarding");
+            toast.success("Please complete your company profile to continue.");
+            return;
+          }
+        }
+        
         navigate("/");
         toast.success(res.data.message);
       }

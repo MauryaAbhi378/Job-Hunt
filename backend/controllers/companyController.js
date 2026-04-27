@@ -137,3 +137,80 @@ export const updateCompany = async (req, res) => {
     });
   }
 };
+
+export const completeOnboarding = async (req, res) => {
+  try {
+    const {
+      name,
+      description,
+      website,
+      location,
+      foundedYear,
+      companyType,
+      industry,
+      companySize,
+      onboarding,
+    } = req.body;
+    const userId = req.id;
+
+    // Validate required fields
+    if (!name || !description || !companyType || !industry || !location) {
+      return res.status(400).json({
+        message: "Missing required fields",
+        success: false,
+      });
+    }
+
+    let logo = null;
+    if (req.file) {
+      const fileUri = getDataUri(req.file);
+      const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+      logo = cloudResponse.secure_url;
+    }
+
+    // Check if company exists or create new one
+    let company = await Company.findOne({ userId });
+
+    if (company) {
+      // Update existing company
+      company.name = name;
+      company.description = description;
+      company.website = website || company.website;
+      company.location = location;
+      company.foundedYear = foundedYear || company.foundedYear;
+      company.companyType = companyType;
+      company.industry = industry;
+      company.companySize = companySize || company.companySize;
+      company.onboarding = true;
+      if (logo) company.logo = logo;
+      await company.save();
+    } else {
+      // Create new company with onboarding data
+      company = await Company.create({
+        name,
+        description,
+        website,
+        location,
+        foundedYear,
+        companyType,
+        industry,
+        companySize,
+        logo,
+        userId,
+        onboarding: true,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Onboarding completed successfully!",
+      company,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Onboarding error:", error.message);
+    return res.status(500).json({
+      message: "Server error during onboarding",
+      success: false,
+    });
+  }
+};
