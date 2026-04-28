@@ -144,6 +144,7 @@ export const completeOnboarding = async (req, res) => {
       name,
       description,
       website,
+      headquarters,
       location,
       foundedYear,
       companyType,
@@ -152,9 +153,16 @@ export const completeOnboarding = async (req, res) => {
       onboarding,
     } = req.body;
     const userId = req.id;
+    const companyHeadquarters = headquarters || location;
 
     // Validate required fields
-    if (!name || !description || !companyType || !industry || !location) {
+    if (
+      !name ||
+      !description ||
+      !companyType ||
+      !industry ||
+      !companyHeadquarters
+    ) {
       return res.status(400).json({
         message: "Missing required fields",
         success: false,
@@ -176,7 +184,7 @@ export const completeOnboarding = async (req, res) => {
       company.name = name;
       company.description = description;
       company.website = website || company.website;
-      company.location = location;
+      company.headquarters = companyHeadquarters;
       company.foundedYear = foundedYear || company.foundedYear;
       company.companyType = companyType;
       company.industry = industry;
@@ -190,7 +198,7 @@ export const completeOnboarding = async (req, res) => {
         name,
         description,
         website,
-        location,
+        headquarters: companyHeadquarters,
         foundedYear,
         companyType,
         industry,

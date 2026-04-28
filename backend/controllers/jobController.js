@@ -1,4 +1,5 @@
 import { Job } from "../models/jobModel.js";
+import { Company } from "../models/companyModel.js";
 
 export const postJob = async (req, res) => {
   try {
@@ -6,7 +7,10 @@ export const postJob = async (req, res) => {
       title,
       category,
       description,
+      jobDescription,
       requirements,
+      candidateRequirements,
+      benefits = [],
       location,
       experience,
       salary,
@@ -14,17 +18,30 @@ export const postJob = async (req, res) => {
       position,
       companyId,
     } = req.body;
+    const finalDescription = description || "";
+    const jobDescriptionList = Array.isArray(jobDescription)
+      ? jobDescription
+      : String(jobDescription || finalDescription)
+          .replace(/<[^>]*>/g, "\n")
+          .split(/[\n,]+/)
+          .map((item) => item.trim())
+          .filter(Boolean);
+    const finalRequirements = candidateRequirements || requirements;
+    const requirementList = Array.isArray(requirements)
+      ? requirements
+      : String(finalRequirements || "")
+          .replace(/<[^>]*>/g, "\n")
+          .split(/[\n,]+/)
+          .map((requirement) => requirement.trim())
+          .filter(Boolean);
 
     if (
       !title ||
-      !category ||
-      !description ||
-      !requirements ||
+      jobDescriptionList.length === 0 ||
+      !finalRequirements ||
       !salary ||
-      !experience ||
       !location ||
       !jobType ||
-      !position ||
       !companyId
     ) {
       return res.status(400).json({
@@ -33,20 +50,37 @@ export const postJob = async (req, res) => {
       });
     }
 
+    const company = await Company.findOne({
+      _id: companyId,
+      userId: req.id,
+      onboarding: true,
+    });
+
+    if (!company) {
+      return res.status(403).json({
+        message: "Please complete onboarding for this company first",
+        success: false,
+        requiresOnboarding: true,
+      });
+    }
+
     const job = await Job.create({
       title,
-      category,
-      description,
-      requirements: requirements.split(","),
+      category: category || "General",
+      description: finalDescription,
+      jobDescription: jobDescriptionList,
+      requirements: requirementList,
+      candidateRequirements: finalRequirements,
+      benefits,
       salary: { min: salary.min, max: salary.max },
       experienceLevel: {
-        min: experience.min,
-        max: experience.max,
+        min: experience?.min ?? 0,
+        max: experience?.max ?? 0,
       },
       location,
       jobType,
-      position,
-      company: companyId,
+      position: position || 1,
+      company: company._id,
       created_by: req.id,
     });
 
@@ -179,9 +213,13 @@ export const updateJob = async (req, res) => {
       title,
       category,
       description,
+      jobDescription,
       requirements,
+      candidateRequirements,
+      benefits,
       location,
       experience,
+      experienceLevel,
       salary,
       jobType,
       position,
@@ -191,14 +229,52 @@ export const updateJob = async (req, res) => {
     let updatedData = {};
     if (title !== undefined) updatedData.title = title;
     if (category !== undefined) updatedData.category = category;
-    if (description !== undefined) updatedData.description = description;
-    if (requirements !== undefined) updatedData.requirements = requirements;
+    if (description !== undefined || jobDescription !== undefined) {
+      const finalDescription = description || "";
+      updatedData.description = finalDescription;
+      updatedData.jobDescription = Array.isArray(jobDescription)
+        ? jobDescription
+        : String(jobDescription || finalDescription)
+            .replace(/<[^>]*>/g, "\n")
+            .split(/[\n,]+/)
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+    if (requirements !== undefined || candidateRequirements !== undefined) {
+      const finalRequirements = candidateRequirements || requirements;
+      updatedData.candidateRequirements = finalRequirements;
+      updatedData.requirements = Array.isArray(requirements)
+        ? requirements
+        : String(finalRequirements || "")
+            .replace(/<[^>]*>/g, "\n")
+            .split(/[\n,]+/)
+            .map((requirement) => requirement.trim())
+            .filter(Boolean);
+    }
+    if (benefits !== undefined) updatedData.benefits = benefits;
     if (location !== undefined) updatedData.location = location;
-    if (experience !== undefined) updatedData.experience = experience;
+    if (experienceLevel !== undefined) updatedData.experienceLevel = experienceLevel;
+    if (experience !== undefined) updatedData.experienceLevel = experience;
     if (salary !== undefined) updatedData.salary = salary;
     if (jobType !== undefined) updatedData.jobType = jobType;
     if (position !== undefined) updatedData.position = position;
-    if (companyId !== undefined) updatedData.companyId = companyId;
+    if (companyId !== undefined) {
+      const company = await Company.findOne({
+        _id: companyId,
+        userId: req.id,
+        onboarding: true,
+      });
+
+      if (!company) {
+        return res.status(403).json({
+          message: "Please complete onboarding for this company first",
+          success: false,
+          requiresOnboarding: true,
+        });
+      }
+
+      updatedData.company = company._id;
+    }
 
     if (Object.keys(updatedData).length === 0) {
       return res.status(400).json({
@@ -207,9 +283,13 @@ export const updateJob = async (req, res) => {
       });
     }
 
-    const job = await Job.findByIdAndUpdate(req.params.id, updatedData, {
-      new: true,
-    });
+    const job = await Job.findOneAndUpdate(
+      { _id: req.params.id, created_by: req.id },
+      updatedData,
+      {
+        new: true,
+      }
+    );
 
     if (!job) {
       return res.status(400).json({
@@ -238,6 +318,10 @@ export const getAdminJobs = async (req, res) => {
       .populate({
         path: "company",
       })
+      .populate({
+        path: "applications",
+        select: "status",
+      })
       .sort({ createdAt: -1 });
 
     if (!jobs) {
@@ -254,6 +338,33 @@ export const getAdminJobs = async (req, res) => {
     console.error("Error during finding Admin job:", error.message);
     return res.status(500).json({
       message: "Server error during finding Admin job",
+      success: false,
+    });
+  }
+};
+
+export const deleteJob = async (req, res) => {
+  try {
+    const job = await Job.findOneAndDelete({
+      _id: req.params.id,
+      created_by: req.id,
+    });
+
+    if (!job) {
+      return res.status(404).json({
+        message: "Job Not Found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      message: "Job deleted",
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error during deleting job:", error.message);
+    return res.status(500).json({
+      message: "Server error during deleting job",
       success: false,
     });
   }

@@ -135,3 +135,48 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .job-description-editor .ql-toolbar,
+  .job-requirements-editor .ql-toolbar {
+    @apply border-0 border-b border-gray-200;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    padding-left: 16px;
+  }
+
+  .job-description-editor .ql-container,
+  .job-requirements-editor .ql-container {
+    @apply border-0 text-base;
+    font-family: inherit;
+  }
+
+  .job-description-editor .ql-editor {
+    min-height: 184px;
+    padding: 20px 16px;
+    font-size: 16px;
+    color: #17233c;
+  }
+
+  .job-requirements-editor .ql-editor {
+    min-height: 140px;
+    padding: 20px 16px;
+    font-size: 16px;
+    color: #17233c;
+  }
+
+  .job-description-editor .ql-editor.ql-blank::before,
+  .job-requirements-editor .ql-editor.ql-blank::before {
+    color: #6b778d;
+    font-style: normal;
+    left: 16px;
+    right: 16px;
+  }
+
+  .job-description-editor .ql-toolbar button,
+  .job-requirements-editor .ql-toolbar button {
+    color: #18304f;
+    margin-right: 12px;
+  }
+}

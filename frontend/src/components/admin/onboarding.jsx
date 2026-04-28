@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,9 +17,11 @@ import { toast } from "sonner";
 import { Loader2, Upload } from "lucide-react";
 import { COMPANIES_API_ENDPOINT } from "../../utils/constant";
 import Navbar from "../layout/Navbar";
+import { setOnboardingStatus } from "../../store/slice/authSlice";
 
 const Onboarding = ({ companyId }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
 
   const normalizeWebsiteUrl = (url) => {
@@ -35,7 +37,7 @@ const Onboarding = ({ companyId }) => {
     name: "",
     description: "",
     website: "",
-    location: "",
+    headquarters: "",
     foundedYear: "",
     companyType: "",
     industry: "",
@@ -108,8 +110,8 @@ const Onboarding = ({ companyId }) => {
       toast.error("Industry is required");
       return false;
     }
-    if (!formData.location.trim()) {
-      toast.error("Location is required");
+    if (!formData.headquarters.trim()) {
+      toast.error("Headquarters is required");
       return false;
     }
     return true;
@@ -130,7 +132,7 @@ const Onboarding = ({ companyId }) => {
       formDataToSend.append("name", formData.name);
       formDataToSend.append("description", formData.description);
       formDataToSend.append("website", websiteUrl);
-      formDataToSend.append("location", formData.location);
+      formDataToSend.append("headquarters", formData.headquarters);
       formDataToSend.append("foundedYear", formData.foundedYear);
       formDataToSend.append("companyType", formData.companyType);
       formDataToSend.append("industry", formData.industry);
@@ -152,6 +154,12 @@ const Onboarding = ({ companyId }) => {
       });
 
       if (res.data.success) {
+        dispatch(
+          setOnboardingStatus({
+            isCompleted: true,
+            companyId: res.data.company?._id || null,
+          })
+        );
         toast.success(res.data.message || "Onboarding completed successfully!");
         navigate("/dashboard");
       }
@@ -356,11 +364,11 @@ const Onboarding = ({ companyId }) => {
                     </div>
                   </div>
 
-                  {/* Location and Company Size - Row */}
+                  {/* Headquarters and Company Size - Row */}
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <Label
-                        htmlFor="location"
+                        htmlFor="headquarters"
                         style={{
                           color: "#1b1b24",
                           fontFamily: "Inter",
@@ -368,12 +376,12 @@ const Onboarding = ({ companyId }) => {
                           fontWeight: "600",
                         }}
                       >
-                        Location
+                        Headquarters
                       </Label>
                       <Input
-                        id="location"
-                        name="location"
-                        value={formData.location}
+                        id="headquarters"
+                        name="headquarters"
+                        value={formData.headquarters}
                         onChange={handleInputChange}
                         placeholder="e.g. San Francisco, CA"
                         className="mt-2 w-full"

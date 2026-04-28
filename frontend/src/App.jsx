@@ -6,12 +6,7 @@ import Jobs from "./page/Jobs.jsx";
 import Browse from "./page/Browse.jsx";
 import Profile from "./components/layout/Profile.jsx";
 import JobDescription from "./components/layout/JobDescription.jsx";
-import Companies from "./components/admin/Companies.jsx";
-import AdminJobs from "./components/admin/AdminJobs.jsx";
-import CreateCompany from "./components/admin/CreateCompany.jsx";
-import CompanySetup from "./components/admin/CompanySetup.jsx";
 import CreateJobs from "./components/admin/CreateJobs.jsx";
-import Applicants from "./components/admin/Applicants.jsx";
 import ProtectedRoute from "./components/admin/ProtectedRoute.jsx";
 import Onboarding from "./components/admin/Onboarding.jsx";
 import OnboardingRoute from "./components/admin/OnboardingRoute.jsx";
@@ -36,7 +31,23 @@ function App() {
     },
     {
       path: "/dashboard",
-      element: <Dashboard />,
+      element: (
+        <OnboardingRoute>
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        </OnboardingRoute>
+      ),
+    },
+    {
+      path: "/admin/dashboard",
+      element: (
+        <OnboardingRoute>
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        </OnboardingRoute>
+      ),
     },
     {
       path: "/jobs",
@@ -55,47 +66,37 @@ function App() {
       element: <JobDescription />,
     },
     {
-      path: "/admin/companies",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <Companies />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
-    },
-    {
       path: "/admin/jobs",
       element: (
         <OnboardingRoute>
           <ProtectedRoute>
-            <AdminJobs />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
-    },
-    {
-      path: "/admin/companies/create",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <CreateCompany />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
-    },
-    {
-      path: "/admin/companies/:id",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <CompanySetup />
+            <Dashboard />
           </ProtectedRoute>
         </OnboardingRoute>
       ),
     },
     {
       path: "/admin/jobs/create",
+      element: (
+        <OnboardingRoute>
+          <ProtectedRoute>
+            <CreateJobs />
+          </ProtectedRoute>
+        </OnboardingRoute>
+      ),
+    },
+    {
+      path: "/admin/create/job",
+      element: (
+        <OnboardingRoute>
+          <ProtectedRoute>
+            <CreateJobs />
+          </ProtectedRoute>
+        </OnboardingRoute>
+      ),
+    },
+    {
+      path: "/admin/post-job",
       element: (
         <OnboardingRoute>
           <ProtectedRoute>
@@ -115,16 +116,6 @@ function App() {
       ),
     },
 
-    {
-      path: "/admin/jobs/:id/applicants",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <Applicants />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
-    },
   ]);
   return (
     <div>

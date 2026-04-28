@@ -6,19 +6,35 @@ const jobSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    category : {
-      type : String,
-      required : true
-    },
-    description: {
+    jobType: {
       type: String,
       required: true,
     },
-    requirements: [
+    description: {
+      type: String,
+    },
+    requirements: {
+      type: [String],
+      required: true,
+    },
+
+    jobDescription: {
+      type: [String],
+      required: true,
+    },
+    location: {
+      type: String,
+      required: true,
+    },
+    candidateRequirements: {
+      type: String,
+    },
+    benefits: [
       {
         type: String,
       },
     ],
+
     salary: {
       min: { type: Number, required: true },
       max: { type: Number, required: true },
@@ -26,18 +42,6 @@ const jobSchema = new mongoose.Schema(
     experienceLevel: {
       min: { type: Number, required: true },
       max: { type: Number, required: true },
-    },
-    location: {
-      type: String,
-      required: true,
-    },
-    jobType: {
-      type: [String],
-      required: true,
-    },
-    position: {
-      type: Number,
-      required: true,
     },
     company: {
       type: mongoose.Schema.Types.ObjectId,
@@ -56,7 +60,7 @@ const jobSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 jobSchema.methods.getExperienceLevel = function () {
