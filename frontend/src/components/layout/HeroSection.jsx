@@ -1,32 +1,19 @@
-import LatestJob from "./LatestJob";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Building2, MapPin, Search, User, ClipboardList, Briefcase, ArrowRight } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
-import { clearPage, fetchJobs, setJobByText } from "../../store/slice/jobSlice";
+import {
+  Building2,
+  User,
+  ClipboardList,
+  Briefcase,
+  ArrowRight,
+  BadgeCheck,
+  Gauge,
+  Grid2X2,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import heroImage from "../../assets/pexels-mart-production-8872411.jpg";
 
 const HeroSection = () => {
-  const {
-    jobByText,
-    filters,
-    page = 1,
-    limit = 3,
-  } = useSelector((store) => store.job);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const searchHandler = () => {
-    if (page > 1) {
-      dispatch(clearPage());
-    }
-
-    dispatch(
-      fetchJobs({ page: page > 1 ? 1 : page, limit, jobByText, filters }),
-    );
-    
-    navigate('/jobs');
-  };
 
   const companies = [
     "webflow",
@@ -37,72 +24,63 @@ const HeroSection = () => {
     "stripe",
   ];
 
+  const recruiterFeatures = [
+    {
+      icon: BadgeCheck,
+      title: "Vetted Talent Pool",
+      text: "Skip the noise. Our proprietary verification process ensures you only see high-quality, relevant candidates.",
+    },
+    {
+      icon: Grid2X2,
+      title: "Effortless Management",
+      text: "Integrated ATS features allow your team to collaborate, rate candidates, and move through the funnel seamlessly.",
+    },
+    {
+      icon: Gauge,
+      title: "Fast Hiring",
+      text: "Reduce your time-to-hire by 40% with our automated screening and direct-to-candidate messaging tools.",
+    },
+  ];
+
   return (
     <div className="bg-white">
-      <section className="relative flex min-h-[calc(100vh-4rem)] flex-col overflow-hidden bg-[radial-gradient(circle_at_18%_22%,rgba(99,102,241,0.12),transparent_24%),radial-gradient(circle_at_82%_24%,rgba(45,212,191,0.14),transparent_22%),linear-gradient(180deg,#ffffff_0%,#f7f8ff_100%)]">
-        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-5 sm:px-10 lg:px-14">
-          <div className="relative z-10 mx-auto flex w-full max-w-3xl flex-1 flex-col items-center justify-center py-16 text-center sm:py-20">
-              <h1 className="max-w-3xl text-4xl font-black leading-tight text-slate-950 sm:text-6xl lg:text-7xl">
-                Find <span className="text-emerald-500">your</span> next job
-                opportunity or{" "}
-                <span className="relative inline-block border-2 border-indigo-400 px-2">
-                  discover
-                  <span className="absolute -bottom-1 -right-1 h-2 w-2 bg-indigo-400" />
-                  <span className="absolute -left-1 -top-1 h-2 w-2 bg-indigo-400" />
-                </span>{" "}
-                <span className="inline-block -rotate-6 rounded-full bg-[#f7c4aa] px-4 pb-2 pt-1 text-slate-950">
-                  qualified
-                </span>{" "}
-                talents
-              </h1>
+      <section className="relative flex flex-col overflow-hidden bg-[#fbf8ff]">
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-10 px-5 py-16 sm:px-10 lg:grid-cols-[0.95fr_1.05fr] lg:px-14 lg:py-20">
+          <div className="relative z-10 max-w-2xl text-center lg:text-left">
+            <h1 className="text-4xl font-black leading-tight text-slate-950 sm:text-5xl lg:text-6xl">
+              Find your next job or the perfect hire
+            </h1>
 
-              <div className="mt-9 flex w-full max-w-2xl flex-col gap-3 rounded-[2rem] border border-slate-200 bg-white p-2 shadow-2xl shadow-indigo-100 sm:flex-row sm:items-center sm:rounded-full">
-                <div className="flex min-w-0 flex-1 items-center gap-2 px-3">
-                  <Search className="h-5 w-5 shrink-0 text-indigo-500" />
-                  <Input
-                    type="text"
-                    value={jobByText.keyword}
-                    onChange={(e) =>
-                      dispatch(
-                        setJobByText({
-                          field: "keyword",
-                          value: e.target.value,
-                        }),
-                      )
-                    }
-                    placeholder="Job title or keyword"
-                    className="h-11 border-none px-0 text-slate-700 shadow-none focus-visible:ring-0"
-                  />
-                </div>
+            <p className="mt-5 max-w-xl text-base font-semibold leading-7 text-slate-500 sm:text-lg">
+              The professional marketplace connecting world-class talent with
+              industry-leading companies. Experience a smarter way to grow your
+              career or scale your team.
+            </p>
 
-                <div className="hidden h-8 w-px bg-slate-200 sm:block" />
-
-                <div className="flex min-w-0 flex-1 items-center gap-2 px-3">
-                  <MapPin className="h-5 w-5 shrink-0 text-indigo-500" />
-                  <Input
-                    type="text"
-                    value={jobByText.location}
-                    onChange={(e) =>
-                      dispatch(
-                        setJobByText({
-                          field: "location",
-                          value: e.target.value,
-                        }),
-                      )
-                    }
-                    placeholder="Enter city"
-                    className="h-11 border-none px-0 text-slate-700 shadow-none focus-visible:ring-0"
-                  />
-                </div>
-
-                <Button
-                  onClick={searchHandler}
-                  className="h-12 rounded-full bg-indigo-500 px-7 font-bold text-white hover:bg-indigo-600"
-                >
-                  Search
-                </Button>
-              </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Button
+                onClick={() => navigate("/jobs")}
+                className="h-12 rounded-md bg-indigo-600 px-8 font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700"
+              >
+                I'm looking for a job
+              </Button>
+              <Button
+                onClick={() => navigate("/Signup")}
+                variant="outline"
+                className="h-12 rounded-md border-slate-300 bg-white px-8 font-bold text-indigo-600 hover:bg-indigo-50"
+              >
+                I'm hiring
+              </Button>
             </div>
+          </div>
+
+          <div className="relative">
+            <img
+              src={heroImage}
+              alt="Professionals working together in an office"
+              className="h-[260px] w-full rounded-xl object-cover shadow-2xl shadow-slate-300/70 sm:h-[340px] lg:h-[360px]"
+            />
+          </div>
         </div>
 
         <div className="w-full bg-indigo-100">
@@ -120,20 +98,17 @@ const HeroSection = () => {
         </div>
       </section>
 
-      {/* How it works section */}
+      {/* Candidate section */}
       <section className="py-20 bg-white">
         <div className="mx-auto max-w-7xl px-5 sm:px-10 lg:px-14">
-          <div className="mx-auto mb-16 max-w-3xl text-center">
-            <p className="mb-4 text-sm font-bold tracking-widest text-[#d89f8a] uppercase">
-              How it works
-            </p>
-            <p className="text-lg text-slate-600">
-              We connect talented professionals with leading companies looking to
-              hire. Whether you're searching for your dream job or seeking the
-              perfect candidate
-            </p>
-          </div>
-
+          <p className="mb-3 text-sm font-black text-indigo-600">
+            For Candidates
+          </p>
+          <h2 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl">
+            Accelerate your career
+          </h2>
+        </div>
+        <div className="mx-auto max-w-7xl px-5 sm:px-10 lg:px-14">
           <div className="relative mx-auto mt-20 mb-16 grid max-w-4xl grid-cols-1 gap-10 md:grid-cols-3 md:gap-0">
             {/* Connecting line 1 */}
             <div className="absolute left-[22%] top-12 z-0 hidden w-[22%] items-center justify-between md:flex">
@@ -187,7 +162,10 @@ const HeroSection = () => {
           </div>
 
           <div className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button onClick={() => navigate("/Signup")} className="flex h-12 items-center gap-2 rounded-full bg-indigo-500 w-42 font-medium text-white hover:bg-indigo-600">
+            <Button
+              onClick={() => navigate("/Signup")}
+              className="flex h-12 items-center gap-2 rounded-full bg-indigo-500 w-42 font-medium text-white hover:bg-indigo-600"
+            >
               Create a profile <ArrowRight className="h-4 w-4" />
             </Button>
             <Button
@@ -201,26 +179,114 @@ const HeroSection = () => {
         </div>
       </section>
 
-      <LatestJob />
+      {/* Recruiters section */}
+      <section className="bg-[#f3eefa] py-16">
+        <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-12 px-5 sm:px-10 lg:grid-cols-[0.95fr_1.05fr] lg:px-14">
+          <div>
+            <p className="mb-3 text-sm font-black text-[#b35b18]">
+              For Recruiters
+            </p>
+            <h2 className="text-3xl font-black leading-tight text-slate-900 sm:text-4xl">
+              Hire better, faster
+            </h2>
+
+            <div className="mt-9 space-y-7">
+              {recruiterFeatures.map(({ icon: Icon, title, text }) => (
+                <div key={title} className="flex gap-4">
+                  <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
+                    <Icon className="h-5 w-5 text-[#b35b18]" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900">
+                      {title}
+                    </h3>
+                    <p className="mt-2 max-w-xl text-sm font-semibold leading-6 text-slate-500">
+                      {text}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative mx-auto hidden h-[360px] w-full max-w-[620px] sm:block">
+            <div className="absolute left-[18%] top-10 w-[285px] rounded-lg bg-white p-3 shadow-lg shadow-slate-300/60">
+              <img
+                src={heroImage}
+                alt="Recruiters reviewing a candidate"
+                className="h-32 w-full rounded-md object-cover"
+              />
+              <div className="mt-4 h-4 w-4/5 rounded bg-slate-100" />
+              <div className="mt-3 h-3 w-1/2 rounded bg-slate-50" />
+            </div>
+
+            <div className="absolute right-0 top-0 w-[260px] rounded-lg bg-white p-4 shadow-lg shadow-slate-300/60">
+              <div className="h-3 w-full rounded bg-slate-100" />
+              <div className="mt-3 h-3 w-4/5 rounded bg-slate-50" />
+              <div className="mt-3 h-3 w-2/3 rounded bg-slate-50" />
+            </div>
+
+            <div className="absolute right-0 top-24 w-[260px] rounded-lg bg-white p-3 shadow-lg shadow-slate-300/60">
+              <div className="flex h-40 items-center justify-center rounded-md bg-slate-900">
+                <div className="relative h-20 w-20 rounded-full border-8 border-slate-700">
+                  <div className="absolute inset-3 rounded-full border-8 border-cyan-400 border-t-transparent" />
+                </div>
+              </div>
+              <div className="mt-4 h-4 w-2/3 rounded bg-slate-100" />
+            </div>
+
+            <div className="absolute bottom-4 left-[18%] w-[285px] rounded-lg bg-indigo-700 p-5 shadow-lg shadow-indigo-300/70">
+              <div className="flex items-center gap-4">
+                <div className="h-9 w-9 rounded-full bg-indigo-300" />
+                <div className="h-4 w-32 rounded bg-indigo-300" />
+              </div>
+              <div className="mt-6 h-2.5 w-full rounded bg-indigo-300" />
+              <div className="mt-4 h-2.5 w-4/5 rounded bg-indigo-300" />
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-white p-3 shadow-lg shadow-slate-300/60 sm:hidden">
+            <img
+              src={heroImage}
+              alt="Recruiters reviewing a candidate"
+              className="h-56 w-full rounded-md object-cover"
+            />
+            <div className="mt-4 rounded-lg bg-indigo-700 p-5">
+              <div className="flex items-center gap-4">
+                <div className="h-9 w-9 rounded-full bg-indigo-300" />
+                <div className="h-4 w-32 rounded bg-indigo-300" />
+              </div>
+              <div className="mt-6 h-2.5 w-full rounded bg-indigo-300" />
+              <div className="mt-4 h-2.5 w-4/5 rounded bg-indigo-300" />
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* CTA Section */}
       <section className="py-20 bg-white">
-        <div className="mx-auto max-w-7xl px-5 sm:px-10 lg:px-14">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-8 rounded-[2.5rem] bg-slate-50 p-10 md:p-14 border border-slate-200 shadow-sm">
-            <div className="flex-1 text-center md:text-left">
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-4">
-                Ready to start your journey?
+        <div className="mx-auto max-w-8xl px-5 sm:px-10 lg:px-14">
+          <div className="flex flex-col items-center justify-center gap-8 rounded-3xl bg-gradient-to-r from-indigo-600 to-indigo-700 p-10 sm:p-16 text-center">
+            <div>
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4">
+                Join JobHunt Today
               </h2>
-              <p className="text-lg text-slate-600 max-w-xl mx-auto md:mx-0">
-                Join over 8,000 professionals who found their dream job through JobHunt.
+              <p className="text-base sm:text-lg text-indigo-100 max-w-2xl mx-auto">
+                Whether you're looking for your next challenge or building a world-class team, we have the tools you need to succeed.
               </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 shrink-0 mt-6 md:mt-0">
-              <Button className="h-14 px-8 rounded-2xl bg-blue-500 hover:bg-blue-600 text-slate-900 font-bold text-base shadow-sm">
-                Get Started Now
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button
+                onClick={() => navigate("/Signup")}
+                className="h-12 px-8 rounded-lg bg-white text-indigo-600 font-bold text-base hover:bg-slate-100 shadow-lg"
+              >
+                Create a profile
               </Button>
-              <Button variant="outline" className="h-14 px-8 rounded-2xl border-2  bg-white text-slate-700 hover:bg-slate-50 font-bold text-base">
-                Learn More
+              <Button
+                onClick={() => navigate("/Signup")}
+                className="h-12 px-8 rounded-lg bg-indigo-800 text-white font-bold text-base hover:bg-indigo-900 shadow-lg"
+              >
+                Start hiring
               </Button>
             </div>
           </div>

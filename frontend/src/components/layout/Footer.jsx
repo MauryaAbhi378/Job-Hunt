@@ -76,12 +76,6 @@ const Footer = () => {
           </div>
 
         </div>
-
-        <div className="mt-12 pt-8 border-t border-gray-200 text-center">
-          <p className="text-gray-500 text-sm">
-            Copyright @ JobHunt 2024. All Rights Reserved.
-          </p>
-        </div>
       </div>
     </footer>
   );

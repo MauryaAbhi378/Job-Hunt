@@ -1,5 +1,6 @@
 import { Job } from "../models/jobModel.js";
 import { Company } from "../models/companyModel.js";
+import { parseQuillHtml } from "../utils/quillParser.js";
 
 export const postJob = async (req, res) => {
   try {
@@ -21,19 +22,11 @@ export const postJob = async (req, res) => {
     const finalDescription = description || "";
     const jobDescriptionList = Array.isArray(jobDescription)
       ? jobDescription
-      : String(jobDescription || finalDescription)
-          .replace(/<[^>]*>/g, "\n")
-          .split(/[\n,]+/)
-          .map((item) => item.trim())
-          .filter(Boolean);
+      : parseQuillHtml(jobDescription || finalDescription);
     const finalRequirements = candidateRequirements || requirements;
     const requirementList = Array.isArray(requirements)
       ? requirements
-      : String(finalRequirements || "")
-          .replace(/<[^>]*>/g, "\n")
-          .split(/[\n,]+/)
-          .map((requirement) => requirement.trim())
-          .filter(Boolean);
+      : parseQuillHtml(finalRequirements || "");
 
     if (
       !title ||
@@ -234,22 +227,14 @@ export const updateJob = async (req, res) => {
       updatedData.description = finalDescription;
       updatedData.jobDescription = Array.isArray(jobDescription)
         ? jobDescription
-        : String(jobDescription || finalDescription)
-            .replace(/<[^>]*>/g, "\n")
-            .split(/[\n,]+/)
-            .map((item) => item.trim())
-            .filter(Boolean);
+        : parseQuillHtml(jobDescription || finalDescription);
     }
     if (requirements !== undefined || candidateRequirements !== undefined) {
       const finalRequirements = candidateRequirements || requirements;
       updatedData.candidateRequirements = finalRequirements;
       updatedData.requirements = Array.isArray(requirements)
         ? requirements
-        : String(finalRequirements || "")
-            .replace(/<[^>]*>/g, "\n")
-            .split(/[\n,]+/)
-            .map((requirement) => requirement.trim())
-            .filter(Boolean);
+        : parseQuillHtml(finalRequirements || "");
     }
     if (benefits !== undefined) updatedData.benefits = benefits;
     if (location !== undefined) updatedData.location = location;

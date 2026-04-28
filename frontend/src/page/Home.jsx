@@ -5,7 +5,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useGetAllJobs from "../hooks/useGetAllJobs.jsx"
-import JobsByCategory from "../components/layout/JobsByCategory.jsx";
 import Review from "../components/layout/Review.jsx";
 
 const Home = () => {
@@ -21,8 +20,6 @@ const Home = () => {
     <div>
       <Navbar />
       <HeroSection />
-      {/* <JobsByCategory/>
-      <Review/> */}
       <Footer />
     </div>
   );

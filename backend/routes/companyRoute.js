@@ -14,8 +14,9 @@ const router = express.Router();
 
 // router.route("/register").post(isAuthenticated, registerCompany);
 // router.route("/get").get(isAuthenticated, isOnboardingComplete, getCompany);
-// router.route("/get/:id").get(isAuthenticated, isOnboardingComplete, getCompanyById);
-// router
+router
+  .route("/get/:id")
+  .get(isAuthenticated, isOnboardingComplete, getCompanyById);
 //   .route("/update/:id")
 //   .put(singleUpload, isAuthenticated, isOnboardingComplete, updateCompany);
 router.route("/onboarding").post(singleUpload, isAuthenticated, completeOnboarding);

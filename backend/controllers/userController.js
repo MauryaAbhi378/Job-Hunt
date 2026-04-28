@@ -149,7 +149,16 @@ export const logout = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { fullname, email, phoneNumber, bio, skills } = req.body;
+    const {
+      fullname,
+      email,
+      phoneNumber,
+      bio,
+      skills,
+      location,
+      education,
+      workExperience,
+    } = req.body;
 
     const file = req.file;
     let cloudResponse;
@@ -170,13 +179,47 @@ export const updateProfile = async (req, res) => {
       });
     }
 
+    const parseArrayField = (value, fieldName) => {
+      if (value === undefined) return undefined;
+      if (Array.isArray(value)) return value;
+
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch (error) {
+        throw new Error(`${fieldName} must be a valid array`);
+      }
+    };
+
     let skillsArray;
-    if (skills) {
+    if (skills !== undefined) {
       skillsArray = skills
         .split(",")
         .map((s) => s.trim())
         .filter(Boolean);
     }
+
+    const educationArray = parseArrayField(education, "education")?.map(
+      (item) => ({
+        institution: item.institution || "",
+        degree: item.degree || "",
+        fieldOfStudy: item.fieldOfStudy || "",
+        startYear: item.startYear || undefined,
+        endYear: item.endYear || undefined,
+        grade: item.grade || "",
+      })
+    );
+    const workExperienceArray = parseArrayField(
+      workExperience,
+      "workExperience"
+    )?.map((item) => ({
+      company: item.company || "",
+      role: item.role || "",
+      description: item.description || "",
+      startDate: item.startDate || undefined,
+      endDate: item.isCurrentlyWorking ? undefined : item.endDate || undefined,
+      isCurrentlyWorking: Boolean(item.isCurrentlyWorking),
+    }));
 
     const userId = req.id;
     let user = await User.findById(userId);
@@ -187,11 +230,16 @@ export const updateProfile = async (req, res) => {
     }
 
     // update fields
-    if (fullname) user.fullname = fullname;
-    if (email) user.email = email;
-    if (phoneNumber) user.phoneNumber = phoneNumber;
-    if (bio) user.profile.bio = bio;
-    if (skillsArray) user.profile.skills = skillsArray;
+    if (fullname !== undefined) user.fullname = fullname;
+    if (email !== undefined) user.email = email;
+    if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+    if (bio !== undefined) user.profile.bio = bio;
+    if (location !== undefined) user.profile.location = location;
+    if (skillsArray !== undefined) user.profile.skills = skillsArray;
+    if (educationArray !== undefined) user.profile.education = educationArray;
+    if (workExperienceArray !== undefined) {
+      user.profile.workExperience = workExperienceArray;
+    }
 
     if (cloudResponse) {
       // build proper inline preview URL

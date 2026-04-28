@@ -6,6 +6,7 @@ import Jobs from "./page/Jobs.jsx";
 import Browse from "./page/Browse.jsx";
 import Profile from "./components/layout/Profile.jsx";
 import JobDescription from "./components/layout/JobDescription.jsx";
+import CompanyOverview from "./components/layout/CompanyOverview.jsx";
 import CreateJobs from "./components/admin/CreateJobs.jsx";
 import ProtectedRoute from "./components/admin/ProtectedRoute.jsx";
 import Onboarding from "./components/admin/Onboarding.jsx";
@@ -64,6 +65,10 @@ function App() {
     {
       path: "/description/:id",
       element: <JobDescription />,
+    },
+    {
+      path: "/company/:id",
+      element: <CompanyOverview />,
     },
     {
       path: "/admin/jobs",

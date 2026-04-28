@@ -13,11 +13,6 @@ const jobSchema = new mongoose.Schema(
     description: {
       type: String,
     },
-    requirements: {
-      type: [String],
-      required: true,
-    },
-
     jobDescription: {
       type: [String],
       required: true,
@@ -26,8 +21,9 @@ const jobSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    candidateRequirements: {
-      type: String,
+    requirements: {
+      type: [String],
+      required: true,
     },
     benefits: [
       {
