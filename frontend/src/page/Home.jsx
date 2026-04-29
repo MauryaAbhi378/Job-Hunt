@@ -5,8 +5,6 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import useGetAllJobs from "../hooks/useGetAllJobs.jsx"
-import Review from "../components/layout/Review.jsx";
-
 const Home = () => {
   useGetAllJobs()
   const { user } = useSelector((store) => store.auth);
