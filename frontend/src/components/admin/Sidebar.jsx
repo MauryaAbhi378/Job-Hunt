@@ -19,7 +19,17 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { companies, singleCompany } = useSelector((store) => store.company);
-  const company = singleCompany || companies?.[0];
+  const { onboardingStatus } = useSelector((store) => store.auth);
+
+  // Prefer singleCompany (set after onboarding), then find by onboardingStatus.companyId,
+  // then fall back to the most recently created company (last in array) for this user.
+  const company =
+    singleCompany ||
+    (onboardingStatus?.companyId
+      ? companies?.find((c) => c._id === onboardingStatus.companyId)
+      : null) ||
+    companies?.[companies.length - 1];
+
   const companyInitial = company?.name?.charAt(0)?.toUpperCase() || "J";
 
   const handleLogout = async () => {
@@ -56,11 +66,10 @@ const Sidebar = () => {
     <aside className="fixed left-0 top-0 z-30 flex h-screen w-[260px] flex-col border-r border-[#dce4ef] bg-[#f8fbff] px-4 py-9">
       <div className="flex items-center gap-4 px-4">
         <div
-          className={`flex items-center justify-center overflow-hidden text-lg font-bold uppercase leading-none text-white ${
-            company?.logo
+          className={`flex items-center justify-center overflow-hidden text-lg font-bold uppercase leading-none text-white ${company?.logo
               ? "h-12 w-12"
               : "h-10 w-10 rounded-lg bg-[#0598cf] shadow-sm"
-          }`}
+            }`}
         >
           {company?.logo ? (
             <img
@@ -91,10 +100,9 @@ const Sidebar = () => {
               key={`${item.label}-${item.path}`}
               to={item.path}
               className={({ isActive }) =>
-                `flex h-11 items-center gap-4 rounded-md px-4 text-[15px] font-medium transition ${
-                  isActive && item.label !== "Analytics"
-                    ? "bg-white text-[#17233c] shadow-sm"
-                    : "text-[#17233c] hover:bg-white"
+                `flex h-11 items-center gap-4 rounded-md px-4 text-[15px] font-medium transition ${isActive && item.label !== "Analytics"
+                  ? "bg-white text-[#17233c] shadow-sm"
+                  : "text-[#17233c] hover:bg-white"
                 }`
               }
             >

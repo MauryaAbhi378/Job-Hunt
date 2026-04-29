@@ -18,6 +18,7 @@ import { Loader2, Upload } from "lucide-react";
 import { COMPANIES_API_ENDPOINT } from "../../utils/constant";
 import Navbar from "../layout/Navbar";
 import { setOnboardingStatus } from "../../store/slice/authSlice";
+import { setSingleCompany } from "../../store/slice/companySlice";
 
 const Onboarding = ({ companyId }) => {
   const navigate = useNavigate();
@@ -160,8 +161,12 @@ const Onboarding = ({ companyId }) => {
             companyId: res.data.company?._id || null,
           })
         );
+        // Store the newly onboarded company as the active company
+        if (res.data.company) {
+          dispatch(setSingleCompany(res.data.company));
+        }
         toast.success(res.data.message || "Onboarding completed successfully!");
-        navigate("/dashboard");
+        navigate("/admin/dashboard");
       }
     } catch (error) {
       console.error("Onboarding error:", error);

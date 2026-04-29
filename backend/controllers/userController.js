@@ -1,4 +1,5 @@
 import { User } from "../models/userModel.js";
+import { Company } from "../models/companyModel.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
@@ -97,6 +98,16 @@ export const login = async (req, res) => {
       expiresIn: "1d",
     });
 
+    // Check onboarding status for recruiters
+    let onboardingStatus = null;
+    if (user.role.toLowerCase() === "recruiter") {
+      const company = await Company.findOne({ userId: user._id, onboarding: true });
+      onboardingStatus = {
+        isCompleted: !!company,
+        companyId: company?._id || null,
+      };
+    }
+
     user = {
       _id: user._id,
       fullname: user.fullname,
@@ -116,6 +127,7 @@ export const login = async (req, res) => {
       .json({
         message: `Welcome back ${user.fullname}`,
         user,
+        onboardingStatus,
         success: true,
       });
   } catch (error) {

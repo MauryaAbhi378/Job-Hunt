@@ -16,8 +16,9 @@ const OnboardingRoute = ({ children }) => {
 
     // Only check for recruiters
     if (user.role?.toLowerCase() === "recruiter") {
-      // If onboarding is not completed, redirect to onboarding
-      if (onboardingStatus && !onboardingStatus.isCompleted) {
+      // onboardingStatus is null until login sets it — treat null as incomplete
+      const isCompleted = onboardingStatus?.isCompleted ?? false;
+      if (!isCompleted) {
         navigate("/onboarding");
         return;
       }

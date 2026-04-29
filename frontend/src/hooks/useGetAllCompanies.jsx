@@ -14,7 +14,11 @@ const useGetAllCompanies = () => {
         });
 
         if (res.data.success) {
-          dispatch(setCompanies(res.data.companies));
+          // Sort by createdAt ascending so the most recently created company is last
+          const sorted = [...(res.data.companies || [])].sort(
+            (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+          );
+          dispatch(setCompanies(sorted));
         }
       } catch (error) {
         console.log(error);

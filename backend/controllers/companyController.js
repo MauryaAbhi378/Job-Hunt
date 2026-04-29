@@ -177,7 +177,12 @@ export const completeOnboarding = async (req, res) => {
     }
 
     // Check if company exists or create new one
-    let company = await Company.findOne({ userId });
+    // Find the company that belongs to this user AND has onboarding: true,
+    // or fall back to the most recently created one for this user.
+    let company = await Company.findOne({ userId, onboarding: true }).sort({ createdAt: -1 });
+    if (!company) {
+      company = await Company.findOne({ userId }).sort({ createdAt: -1 });
+    }
 
     if (company) {
       // Update existing company

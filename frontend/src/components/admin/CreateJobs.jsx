@@ -33,7 +33,7 @@ const jobTypes = ["Full-time", "Part-time", "Contract", "Internship", "Remote"];
 const CreateJobs = () => {
   useGetAllCompanies();
   const { companies } = useSelector((store) => store.company);
-  const { loading } = useSelector((store) => store.auth);
+  const { loading, onboardingStatus } = useSelector((store) => store.auth);
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -42,7 +42,14 @@ const CreateJobs = () => {
   const descriptionQuillRef = useRef(null);
   const requirementsQuillRef = useRef(null);
 
-  const defaultCompanyId = useMemo(() => companies?.[0]?._id || "", [companies]);
+  // Use the onboarded company if available, otherwise fall back to the most recently created one
+  const defaultCompanyId = useMemo(() => {
+    if (onboardingStatus?.companyId) {
+      const match = companies?.find((c) => c._id === onboardingStatus.companyId);
+      if (match) return match._id;
+    }
+    return companies?.[companies.length - 1]?._id || "";
+  }, [companies, onboardingStatus]);
 
   const [input, setInput] = useState({
     title: "",

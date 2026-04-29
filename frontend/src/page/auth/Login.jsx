@@ -13,7 +13,7 @@ import { setLoading, setUser, setOnboardingStatus } from "../../store/slice/auth
 import { Loader2 } from "lucide-react";
 
 const Login = () => {
-  const { user } = useSelector((store) => store.auth);
+  const { user, onboardingStatus } = useSelector((store) => store.auth);
   const [input, setInput] = useState({
     email: "",
     password: "",
@@ -81,7 +81,13 @@ const Login = () => {
   useEffect(() => {
     if (user) {
       if (user.role?.toLowerCase() === "recruiter") {
-        navigate("/admin/dashboard");
+        // Only redirect to dashboard if onboarding is complete
+        const isCompleted = onboardingStatus?.isCompleted ?? false;
+        if (isCompleted) {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/onboarding");
+        }
       } else {
         navigate("/");
       }
