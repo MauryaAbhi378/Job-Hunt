@@ -12,6 +12,7 @@ import ProtectedRoute from "./components/admin/ProtectedRoute.jsx";
 import Onboarding from "./components/admin/Onboarding.jsx";
 import OnboardingRoute from "./components/admin/OnboardingRoute.jsx";
 import Dashboard from "./components/admin/Dashboard.jsx";
+import Application from "./components/layout/Application.jsx";
 function App() {
   const appRouter = createBrowserRouter([
     {
@@ -57,6 +58,10 @@ function App() {
     {
       path: "/browse",
       element: <Browse />,
+    },
+    {
+      path: "/applications",
+      element: <Application />,
     },
     {
       path: "/profile",

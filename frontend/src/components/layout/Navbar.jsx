@@ -36,6 +36,11 @@ const Navbar = () => {
     }
   };
 
+  // Don't show navbar for recruiter
+  if (user && user.role === "recruiter") {
+    return null;
+  }
+
   return (
     <div className="bg-white">
       <div className="flex items-center justify-between mx-auto max-w-7xl h-16">
@@ -46,28 +51,16 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-12">
           <ul className="flex font-medium items-center gap-5">
-            {user && user.role === "recruiter" ? (
+            {user && user.role === "student" ? (
               <>
                 <li>
-                  <Link to="/admin/companies">Companies</Link>
+                  <Link to="/jobs">Jobs</Link>
                 </li>
                 <li>
-                  <Link to="/admin/jobs">Jobs</Link>
+                  <Link to="/applications">Applications</Link>
                 </li>
               </>
-            ) : (
-              <>
-                <li>
-                  <Link to="/">Home</Link>
-                </li>
-                <li>
-                  <Link to="/jobs">Find Job</Link>
-                </li>
-                {/* <li>
-                  <Link to="/browse">Browse</Link>
-                </li> */}
-              </>
-            )}
+            ) : null}
           </ul>
           {!user ? (
             <div className="flex items-center gap-2">
@@ -111,14 +104,12 @@ const Navbar = () => {
                     </div>
                   </div>
                   <div className="flex flex-col">
-                    {user && user.role === "student" && (
-                      <Link to="/profile" className="flex items-center">
-                        <User2 />
-                        <button className="px-2 py-2 bg-white text-black cursor-pointer outline-none hover:underline underline-offset-4">
-                          View Profile
-                        </button>
-                      </Link>
-                    )}
+                    <Link to="/profile" className="flex items-center">
+                      <User2 />
+                      <button className="px-2 py-2 bg-white text-black cursor-pointer outline-none hover:underline underline-offset-4">
+                        View Profile
+                      </button>
+                    </Link>
                     <div className="flex items-center">
                       <LogOut />
                       <button

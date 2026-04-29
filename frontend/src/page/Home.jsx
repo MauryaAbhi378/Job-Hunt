@@ -12,10 +12,20 @@ const Home = () => {
   const { user } = useSelector((store) => store.auth);
   const navigate = useNavigate();
   useEffect(() => {
-    if (user && user.role === "recruiter") {
-      navigate("/admin/companies");
+    if (user) {
+      if (user.role === "recruiter") {
+        navigate("/admin/companies");
+      } else if (user.role === "student") {
+        navigate("/jobs");
+      }
     }
   },  [user, navigate]);
+
+  // Only show home page if user is not logged in
+  if (user) {
+    return null;
+  }
+
   return (
     <div>
       <Navbar />
