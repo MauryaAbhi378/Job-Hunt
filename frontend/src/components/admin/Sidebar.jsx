@@ -22,12 +22,13 @@ const Sidebar = () => {
   const { onboardingStatus } = useSelector((store) => store.auth);
 
   // Prefer singleCompany (set after onboarding), then find by onboardingStatus.companyId,
-  // then fall back to the most recently created company (last in array) for this user.
+  // then find any company with onboarding: true, then fall back to most recently created.
   const company =
     singleCompany ||
     (onboardingStatus?.companyId
       ? companies?.find((c) => c._id === onboardingStatus.companyId)
       : null) ||
+    [...(companies || [])].reverse().find((c) => c.onboarding === true) ||
     companies?.[companies.length - 1];
 
   const companyInitial = company?.name?.charAt(0)?.toUpperCase() || "J";

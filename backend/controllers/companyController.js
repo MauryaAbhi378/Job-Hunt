@@ -92,7 +92,19 @@ export const getCompanyById = async (req, res) => {
 
 export const updateCompany = async (req, res) => {
   try {
-    const { name, description, website, location } = req.body;
+    const {
+      name,
+      description,
+      website,
+      location,
+      headquarters,
+      foundedYear,
+      companyType,
+      industry,
+      companySize,
+      onboarding,
+    } = req.body;
+
     let logo = null;
     if (req.file) {
       const fileUri = getDataUri(req.file);
@@ -105,7 +117,14 @@ export const updateCompany = async (req, res) => {
     if (description !== undefined) updateData.description = description;
     if (website !== undefined) updateData.website = website;
     if (location !== undefined) updateData.location = location;
-    if (logo !== undefined) updateData.logo = logo;
+    if (headquarters !== undefined) updateData.headquarters = headquarters;
+    if (foundedYear !== undefined) updateData.foundedYear = foundedYear;
+    if (companyType !== undefined) updateData.companyType = companyType;
+    if (industry !== undefined) updateData.industry = industry;
+    if (companySize !== undefined) updateData.companySize = companySize;
+    // If the onboarding form is calling this, mark onboarding as complete
+    if (onboarding === "true" || onboarding === true) updateData.onboarding = true;
+    if (logo) updateData.logo = logo;
 
     if (Object.keys(updateData).length === 0) {
       return res.status(400).json({
@@ -127,6 +146,7 @@ export const updateCompany = async (req, res) => {
 
     return res.status(200).json({
       message: "Company information updated.",
+      company,
       success: true,
     });
   } catch (error) {

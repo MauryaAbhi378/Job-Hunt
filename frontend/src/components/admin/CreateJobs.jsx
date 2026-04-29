@@ -42,13 +42,22 @@ const CreateJobs = () => {
   const descriptionQuillRef = useRef(null);
   const requirementsQuillRef = useRef(null);
 
-  // Use the onboarded company if available, otherwise fall back to the most recently created one
+  // Use the onboarded company if available, otherwise fall back to the most recently
+  // created company that has completed onboarding (onboarding: true)
   const defaultCompanyId = useMemo(() => {
+    if (!companies?.length) return "";
+    // First priority: match the company from onboardingStatus
     if (onboardingStatus?.companyId) {
-      const match = companies?.find((c) => c._id === onboardingStatus.companyId);
+      const match = companies.find((c) => c._id === onboardingStatus.companyId);
       if (match) return match._id;
     }
-    return companies?.[companies.length - 1]?._id || "";
+    // Second priority: find any company with onboarding: true (most recent first)
+    const onboarded = [...companies]
+      .reverse()
+      .find((c) => c.onboarding === true);
+    if (onboarded) return onboarded._id;
+    // Last resort: most recently created company
+    return companies[companies.length - 1]?._id || "";
   }, [companies, onboardingStatus]);
 
   const [input, setInput] = useState({
@@ -66,10 +75,10 @@ const CreateJobs = () => {
   });
 
   useEffect(() => {
-    if (!input.companyId && defaultCompanyId) {
+    if (defaultCompanyId) {
       setInput((prev) => ({ ...prev, companyId: defaultCompanyId }));
     }
-  }, [defaultCompanyId, input.companyId]);
+  }, [defaultCompanyId]);
 
   const handleInputChange = (e) => {
     setInput((prev) => ({ ...prev, [e.target.name]: e.target.value }));
