@@ -171,11 +171,12 @@ export const updateProfile = async (req, res) => {
       const baseName = path.basename(file.originalname, ext);
 
       cloudResponse = await cloudinary.uploader.upload(fileUri.content, {
-        resource_type: "raw",
+        resource_type: "auto",
         folder: "user_profiles",
-        public_id: `${Date.now()}-${baseName}${ext}`, // keep extension
+        public_id: `${Date.now()}-${baseName}`,
         use_filename: true,
         unique_filename: false,
+        format: "pdf",
       });
     }
 
@@ -242,10 +243,9 @@ export const updateProfile = async (req, res) => {
     }
 
     if (cloudResponse) {
-      // build proper inline preview URL
-      const inlineUrl = `https://res.cloudinary.com/dgo4t2vuf/raw/upload/fl_inline/${cloudResponse.public_id}.${cloudResponse.format}`;
-
-      user.profile.resume = inlineUrl;
+      // resource_type "auto" with format "pdf" stores under /image/ delivery
+      // secure_url will have correct Content-Type: application/pdf
+      user.profile.resume = cloudResponse.secure_url;
       user.profile.resumeDownload = cloudResponse.secure_url;
       user.profile.resumeName = file.originalname;
     }

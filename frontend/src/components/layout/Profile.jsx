@@ -9,6 +9,8 @@ import {
   MapPin,
   PenLine,
   Plus,
+  Download,
+  Eye,
 } from "lucide-react";
 
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
@@ -111,6 +113,11 @@ const Profile = () => {
   const [skillsModal, setSkillsModal] = useState({
     open: false,
     value: skills.join(", "),
+  });
+  const [resumeModal, setResumeModal] = useState({
+    open: false,
+    file: null,
+    loading: false,
   });
 
   const updateProfileArrays = async (payload) => {
@@ -252,6 +259,62 @@ const Profile = () => {
     }
   };
 
+  const saveResume = async (e) => {
+    e.preventDefault();
+    if (!resumeModal.file) {
+      toast.error("Please select a resume file");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", resumeModal.file);
+
+    try {
+      setResumeModal((prev) => ({ ...prev, loading: true }));
+      const res = await axios.post(
+        `${USER_API_ENDPOINT}/profile/update`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+          withCredentials: true,
+        }
+      );
+
+      if (res.data.success) {
+        dispatch(setUser(res.data.user));
+        toast.success("Resume uploaded successfully");
+        setResumeModal({ open: false, file: null, loading: false });
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Unable to upload resume");
+    } finally {
+      setResumeModal((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  const handleResumeChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Check file type (PDF only for now)
+      if (!file.type.includes("pdf")) {
+        toast.error("Please upload a PDF file");
+        return;
+      }
+      setResumeModal((prev) => ({ ...prev, file }));
+    }
+  };
+
+  const getResumeLastUpdated = () => {
+    if (!user?.updatedAt) return "Never";
+    const date = new Date(user.updatedAt);
+    const now = new Date();
+    const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+
+    if (diffInDays === 0) return "Today";
+    if (diffInDays === 1) return "1 day ago";
+    return `${diffInDays} days ago`;
+  };
+
   return (
     <div className="min-h-screen bg-[#fbf7ff] text-slate-950">
       <Navbar />
@@ -335,6 +398,67 @@ const Profile = () => {
         </aside>
 
         <div className="space-y-6">
+          {/* Resume Section */}
+          <section className="rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-800 p-6 shadow-sm text-white">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <div>
+                <h3 className="text-2xl font-bold">Current Resume</h3>
+                <p className="text-indigo-100 text-sm mt-1">
+                  Your resume was last updated {getResumeLastUpdated()}. Ensure it
+                  includes your most recent achievements.
+                </p>
+              </div>
+              <div className="text-indigo-200 opacity-50">
+                <svg
+                  className="w-16 h-16"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" />
+                  <path d="M14 2v6h6M9 13h6M9 17h6" opacity="0.5" />
+                </svg>
+              </div>
+            </div>
+
+            <div className="flex gap-3 flex-wrap">
+              {profile.resume ? (
+                <>
+                  <a
+                    href={profile.resume}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition"
+                  >
+                    <Eye className="w-4 h-4" />
+                    View Resume
+                  </a>
+                  <a
+                    href={profile.resumeDownload || profile.resume}
+                    download
+                    className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </a>
+                  <Button
+                    onClick={() => setResumeModal({ open: true, file: null, loading: false })}
+                    className="bg-white text-indigo-700 hover:bg-indigo-50 font-medium"
+                  >
+                    Update Resume
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={() => setResumeModal({ open: true, file: null, loading: false })}
+                  className="bg-white text-indigo-700 hover:bg-indigo-50 font-medium"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Upload Resume
+                </Button>
+              )}
+            </div>
+          </section>
+
           <section className="rounded-lg border border-slate-100 bg-white p-7 shadow-sm">
             <div className="mb-7 flex items-center justify-between gap-4">
               <h2 className="text-2xl font-bold">Work Experience</h2>
@@ -736,6 +860,61 @@ const Profile = () => {
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : null}
                 Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={resumeModal.open}
+        onOpenChange={(open) =>
+          setResumeModal((prev) => ({ ...prev, open }))
+        }
+      >
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>
+              {profile.resume ? "Update Resume" : "Upload Resume"}
+            </DialogTitle>
+          </DialogHeader>
+          <form onSubmit={saveResume} className="space-y-5">
+            <div className="space-y-2">
+              <Label htmlFor="resume-file">Select PDF File</Label>
+              <Input
+                id="resume-file"
+                type="file"
+                accept=".pdf"
+                onChange={handleResumeChange}
+                disabled={resumeModal.loading}
+                className="cursor-pointer"
+              />
+              {resumeModal.file && (
+                <p className="text-sm text-slate-600 mt-2">
+                  Selected: {resumeModal.file.name}
+                </p>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setResumeModal({ open: false, file: null, loading: false })
+                }
+                disabled={resumeModal.loading}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={resumeModal.loading || !resumeModal.file}
+              >
+                {resumeModal.loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : null}
+                {profile.resume ? "Update" : "Upload"}
               </Button>
             </DialogFooter>
           </form>

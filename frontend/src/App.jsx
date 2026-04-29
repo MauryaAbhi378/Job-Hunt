@@ -12,6 +12,8 @@ import ProtectedRoute from "./components/admin/ProtectedRoute.jsx";
 import Onboarding from "./components/admin/Onboarding.jsx";
 import OnboardingRoute from "./components/admin/OnboardingRoute.jsx";
 import Dashboard from "./components/admin/Dashboard.jsx";
+import Applicants from "./components/admin/Applicants.jsx";
+import AllApplicants from "./components/admin/AllApplicants.jsx";
 import Application from "./components/layout/Application.jsx";
 function App() {
   const appRouter = createBrowserRouter([
@@ -30,16 +32,6 @@ function App() {
     {
       path: "/onboarding",
       element: <Onboarding />,
-    },
-    {
-      path: "/dashboard",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
     },
     {
       path: "/admin/dashboard",
@@ -76,36 +68,6 @@ function App() {
       element: <CompanyOverview />,
     },
     {
-      path: "/admin/jobs",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <Dashboard />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
-    },
-    {
-      path: "/admin/jobs/create",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <CreateJobs />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
-    },
-    {
-      path: "/admin/create/job",
-      element: (
-        <OnboardingRoute>
-          <ProtectedRoute>
-            <CreateJobs />
-          </ProtectedRoute>
-        </OnboardingRoute>
-      ),
-    },
-    {
       path: "/admin/post-job",
       element: (
         <OnboardingRoute>
@@ -116,11 +78,21 @@ function App() {
       ),
     },
     {
-      path: "/admin/job/update/:id", 
+      path: "/admin/applicants",
       element: (
         <OnboardingRoute>
           <ProtectedRoute>
-            <CreateJobs />
+            <AllApplicants />
+          </ProtectedRoute>
+        </OnboardingRoute>
+      ),
+    },
+    {
+      path: "/admin/jobs/:id/applicants",
+      element: (
+        <OnboardingRoute>
+          <ProtectedRoute>
+            <Applicants />
           </ProtectedRoute>
         </OnboardingRoute>
       ),

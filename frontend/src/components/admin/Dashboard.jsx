@@ -249,10 +249,10 @@ const Dashboard = () => {
                             </button>
                             <button
                               type="button"
-                              onClick={() => navigate(`/description/${job._id}`)}
+                              onClick={() => navigate(`/admin/jobs/${job._id}/applicants`)}
                               className="block h-9 w-full rounded-md px-3 text-left text-sm text-[#17233c] hover:bg-[#f5f7fb]"
                             >
-                              View
+                              View Applicants
                             </button>
                           </PopoverContent>
                         </Popover>

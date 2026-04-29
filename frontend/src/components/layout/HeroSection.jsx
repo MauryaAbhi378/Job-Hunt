@@ -191,11 +191,12 @@ const HeroSection = () => {
             </h2>
 
             <div className="mt-9 space-y-7">
-              {recruiterFeatures.map(({ title, text }) => (
+              {recruiterFeatures.map(({ icon: Icon, title, text }) => (
                 <div key={title} className="flex gap-4">
                   <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white shadow-sm">
                     <Icon className="h-5 w-5 text-[#b35b18]" />
                   </div>
+
                   <div>
                     <h3 className="text-lg font-black text-slate-900">
                       {title}

@@ -47,7 +47,7 @@ const Sidebar = () => {
     },
     {
       label: "Applicants",
-      path: "/admin/jobs",
+      path: "/admin/applicants",
       icon: UsersRound,
     },
   ];

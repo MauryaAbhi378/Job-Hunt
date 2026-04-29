@@ -61,8 +61,13 @@ const Login = () => {
             return;
           }
         }
-        
-        navigate("/");
+
+        // Redirect recruiters to admin dashboard, others to home
+        if (res.data.user.role?.toLowerCase() === "recruiter") {
+          navigate("/admin/dashboard");
+        } else {
+          navigate("/");
+        }
         toast.success(res.data.message);
       }
     } catch (error) {
@@ -75,7 +80,11 @@ const Login = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      if (user.role?.toLowerCase() === "recruiter") {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/");
+      }
     }
   });
 
