@@ -26,13 +26,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // CORS configuration object to allow frontend at localhost:5173 to communicate with the backend
-const corsOption = {
-  origin: "http://localhost:5173", // Allow requests only from this origin (your React app)
-  credentials: true, // Allow sending of cookies and HTTP authentication
-};
-
-// Enable CORS using the configuration above
-app.use(cors(corsOption));
+app.use(cors({
+  origin: [
+    'http://localhost:5173',
+    'https://job-hunt-flax.vercel.app/' // add after frontend is deployed
+  ],
+  credentials: true
+}));
 
 app.use("/api/user", userRoute);
 app.use("/api/company", companyRoute);
@@ -44,3 +44,5 @@ app.listen(PORT, () => {
   connectDB();
   console.log(`Sever running on PORT : ${PORT}`);
 });
+
+module.exports = app;
