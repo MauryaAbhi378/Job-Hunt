@@ -10,26 +10,23 @@ import jobRouter from "./routes/jobRoute.js";
 import applicationRoute from "./routes/applicationRoute.js";
 
 dotenv.config();
+
+connectDB();
+
 const app = express();
 
-//To parse array
 app.set("query parser", (str) => {
-  return qs.parse(str, {
-    arrayLimit: 1000,
-  });
+  return qs.parse(str, { arrayLimit: 1000 });
 });
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
-
 app.use(cookieParser());
 
-// CORS configuration object to allow frontend at localhost:5173 to communicate with the backend
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    process.env.CLIENT_URL  // add after frontend is deployed
+    process.env.CLIENT_URL
   ],
   credentials: true
 }));
@@ -40,9 +37,11 @@ app.use("/api/job", jobRouter);
 app.use("/api/application", applicationRoute);
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  connectDB();
-  console.log(`Sever running on PORT : ${PORT}`);
-});
 
-module.exports = app;
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on PORT : ${PORT}`);
+  });
+}
+
+export default app; 
