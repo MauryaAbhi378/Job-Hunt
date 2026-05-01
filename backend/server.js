@@ -29,7 +29,7 @@ app.use(cookieParser());
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://job-hunt-flax.vercel.app/' // add after frontend is deployed
+    process.env.CLIENT_URL  // add after frontend is deployed
   ],
   credentials: true
 }));
