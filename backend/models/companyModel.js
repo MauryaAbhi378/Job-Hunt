@@ -16,12 +16,14 @@ const companySchema = new mongoose.Schema(
     },
     headquarters: {
       type: String,
+      required : true,
     },
     logo: {
       type: String,
     },
     foundedYear: {
       type: Number,
+      required : true,
     },
     companyType: {
       type: String,
@@ -35,7 +37,8 @@ const companySchema = new mongoose.Schema(
     },
     companySize: {
       type: String,
-      enum: ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"]
+      enum: ["1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"],
+      required : true,
     },
     onboarding: {
       type: Boolean,
