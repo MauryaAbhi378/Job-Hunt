@@ -231,3 +231,97 @@ export const deleteJob = async (req, res) => {
     });
   }
 };
+
+export const getJobById = async (req, res) => {
+  try {
+    const job = await Job.findById(req.params.id).populate("company");
+
+    if (!job) {
+      return res.status(404).json({
+        message: "Job Not Found",
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
+      job,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error during fetching job by id:", error.message);
+    return res.status(500).json({
+      message: "Server error during fetching job",
+      success: false,
+    });
+  }
+};
+
+export const updateJob = async (req, res) => {
+  try {
+    const {
+      title,
+      description,
+      jobDescription,
+      candidateRequirements,
+      requirements,
+      benefits,
+      location,
+      salary,
+      experienceLevel,
+      experience,
+      jobType,
+    } = req.body;
+
+    // Only the recruiter who created the job can update it
+    const job = await Job.findOne({ _id: req.params.id, created_by: req.id });
+
+    if (!job) {
+      return res.status(404).json({
+        message: "Job not found or you are not authorized to update it",
+        success: false,
+      });
+    }
+
+    const finalDescription = description || "";
+    const jobDescriptionList = Array.isArray(jobDescription)
+      ? jobDescription
+      : parseQuillHtml(jobDescription || finalDescription);
+
+    const finalRequirements = candidateRequirements || requirements;
+    const requirementList = Array.isArray(requirements)
+      ? requirements
+      : parseQuillHtml(finalRequirements || "");
+
+    const finalSalary = salary || {};
+    const finalExperience = experienceLevel || experience || {};
+
+    if (title !== undefined) job.title = title;
+    if (jobType !== undefined) job.jobType = jobType;
+    if (location !== undefined) job.location = location;
+    if (finalDescription !== undefined) job.description = finalDescription;
+    if (jobDescriptionList.length > 0) job.jobDescription = jobDescriptionList;
+    if (requirementList.length > 0) job.requirements = requirementList;
+    if (finalRequirements !== undefined) job.candidateRequirements = finalRequirements;
+    if (benefits !== undefined) job.benefits = benefits;
+    if (finalSalary.min !== undefined && finalSalary.max !== undefined) {
+      job.salary = { min: finalSalary.min, max: finalSalary.max };
+    }
+    if (finalExperience.min !== undefined && finalExperience.max !== undefined) {
+      job.experienceLevel = { min: finalExperience.min, max: finalExperience.max };
+    }
+
+    await job.save();
+
+    return res.status(200).json({
+      message: "Job updated successfully",
+      job,
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error during updating job:", error.message);
+    return res.status(500).json({
+      message: "Server error during updating job",
+      success: false,
+    });
+  }
+};

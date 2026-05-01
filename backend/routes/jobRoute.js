@@ -5,9 +5,9 @@ import {
   deleteJob,
   getAdminJobs,
   getAllJobs,
-  // getJobById,
+  getJobById,
   postJob,
-  // updateJob,
+  updateJob,
 } from "../controllers/jobController.js";
 
 const router = express.Router();
@@ -17,6 +17,12 @@ router.route("/get").get(isAuthenticated, getAllJobs);
 router
   .route("/getadminjobs")
   .get(isAuthenticated, isOnboardingComplete, getAdminJobs);
+
+router.route("/get/:id").get(isAuthenticated, getJobById);
+
+router
+  .route("/job/update/:id")
+  .put(isAuthenticated, isOnboardingComplete, updateJob);
 
 router
   .route("/job/delete/:id")

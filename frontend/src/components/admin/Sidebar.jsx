@@ -12,6 +12,7 @@ import axios from "axios";
 import { toast } from "sonner";
 import useGetAllCompanies from "../../hooks/useGetAllCompanies";
 import { setUser } from "../../store/slice/authSlice";
+import { clearCompanyState } from "../../store/slice/companySlice";
 import { USER_API_ENDPOINT } from "../../utils/constant";
 
 const Sidebar = () => {
@@ -21,15 +22,16 @@ const Sidebar = () => {
   const { companies, singleCompany } = useSelector((store) => store.company);
   const { onboardingStatus } = useSelector((store) => store.auth);
 
-  // Prefer singleCompany (set after onboarding), then find by onboardingStatus.companyId,
-  // then find any company with onboarding: true, then fall back to most recently created.
+  // Pick the company that matches the onboarding companyId first,
+  // then singleCompany (set right after onboarding in the same session),
+  // then fall back to the first company returned by the API (already
+  // scoped to the logged-in recruiter by the backend).
   const company =
-    singleCompany ||
     (onboardingStatus?.companyId
       ? companies?.find((c) => c._id === onboardingStatus.companyId)
       : null) ||
-    [...(companies || [])].reverse().find((c) => c.onboarding === true) ||
-    companies?.[companies.length - 1];
+    singleCompany ||
+    companies?.[0];
 
   const companyInitial = company?.name?.charAt(0)?.toUpperCase() || "J";
 
@@ -41,6 +43,7 @@ const Sidebar = () => {
 
       if (res.data.success) {
         dispatch(setUser(null));
+        dispatch(clearCompanyState());
         toast.success(res.data.message || "Logged out successfully");
         navigate("/");
       }

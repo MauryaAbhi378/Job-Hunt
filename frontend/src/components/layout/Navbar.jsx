@@ -11,6 +11,7 @@ import { User2, LogOut } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { setUser } from "../../store/slice/authSlice";
+import { clearCompanyState } from "../../store/slice/companySlice";
 import axios from "axios";
 import { USER_API_ENDPOINT } from "../../utils/constant";
 
@@ -27,6 +28,7 @@ const Navbar = () => {
 
       if (res.data.success) {
         dispatch(setUser(null));
+        dispatch(clearCompanyState());
         navigate("/");
         toast.success(res.data.message);
       }

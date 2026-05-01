@@ -13,6 +13,10 @@ const authSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = action.payload;
+      // Clear onboarding status on logout so the next recruiter starts fresh
+      if (action.payload === null) {
+        state.onboardingStatus = null;
+      }
     },
     setOnboardingStatus: (state, action) => {
       state.onboardingStatus = action.payload;

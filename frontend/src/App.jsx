@@ -78,6 +78,16 @@ function App() {
       ),
     },
     {
+      path: "/admin/job/update/:id",
+      element: (
+        <OnboardingRoute>
+          <ProtectedRoute>
+            <CreateJobs />
+          </ProtectedRoute>
+        </OnboardingRoute>
+      ),
+    },
+    {
       path: "/admin/applicants",
       element: (
         <OnboardingRoute>

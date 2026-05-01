@@ -41,6 +41,8 @@ const CreateJobs = () => {
   const requirementsRef = useRef(null);
   const descriptionQuillRef = useRef(null);
   const requirementsQuillRef = useRef(null);
+  // Tracks whether editors have been seeded with fetched job data
+  const editorsSeededRef = useRef(false);
 
   // Use the onboarded company if available, otherwise fall back to the most recently
   // created company that has completed onboarding (onboarding: true)
@@ -139,19 +141,29 @@ const CreateJobs = () => {
 
   const syncEditorHtml = (editor, html) => {
     if (!editor || editor.hasFocus()) return;
-    const nextHtml = html || "";
+    // Always coerce to a plain string — arrays from the DB must not reach Quill
+    const nextHtml = Array.isArray(html)
+      ? html.map((line) => `<p>${line}</p>`).join("")
+      : (html || "");
     if (editor.root.innerHTML !== nextHtml) {
       editor.clipboard.dangerouslyPasteHTML(nextHtml);
     }
   };
 
+  // Seed editors once they are ready AND job data has been fetched
   useEffect(() => {
-    syncEditorHtml(descriptionQuillRef.current, input.jobDescription);
-  }, [input.jobDescription]);
-
-  useEffect(() => {
-    syncEditorHtml(requirementsQuillRef.current, input.candidateRequirements);
-  }, [input.candidateRequirements]);
+    if (
+      !id ||
+      editorsSeededRef.current ||
+      !descriptionQuillRef.current ||
+      !requirementsQuillRef.current
+    ) return;
+    if (input.jobDescription || input.candidateRequirements) {
+      syncEditorHtml(descriptionQuillRef.current, input.jobDescription);
+      syncEditorHtml(requirementsQuillRef.current, input.candidateRequirements);
+      editorsSeededRef.current = true;
+    }
+  }, [input.jobDescription, input.candidateRequirements, id]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -228,6 +240,7 @@ const CreateJobs = () => {
   useEffect(() => {
     const fetchJob = async () => {
       if (!id) return;
+      editorsSeededRef.current = false;
 
       try {
         const res = await axios.get(`${JOB_API_ENDPOINT}/get/${id}`, {
@@ -236,18 +249,30 @@ const CreateJobs = () => {
 
         if (res.data.success) {
           const job = res.data.job;
+
+          // jobDescription is stored as string[] in the DB — convert to HTML for Quill
+          const descHtml = Array.isArray(job.jobDescription)
+            ? job.jobDescription.map((line) => `<p>${line}</p>`).join("")
+            : (job.jobDescription || job.description || "");
+
+          // candidateRequirements may be a plain string or array
+          const reqHtml = Array.isArray(job.candidateRequirements)
+            ? job.candidateRequirements.map((line) => `<p>${line}</p>`).join("")
+            : Array.isArray(job.requirements)
+            ? job.requirements.map((line) => `<p>${line}</p>`).join("")
+            : (job.candidateRequirements || job.requirements?.join("\n") || "");
+
           setInput({
             title: job.title || "",
             jobType: job.jobType || "Full-time",
             location: job.location || "",
-            experienceMin: job.experienceLevel?.min || "",
-            experienceMax: job.experienceLevel?.max || "",
-            salaryMin: job.salary?.min || "",
-            salaryMax: job.salary?.max || "",
+            experienceMin: job.experienceLevel?.min ?? "",
+            experienceMax: job.experienceLevel?.max ?? "",
+            salaryMin: job.salary?.min ?? "",
+            salaryMax: job.salary?.max ?? "",
             benefits: job.benefits || [],
-            jobDescription: job.jobDescription || job.description || "",
-            candidateRequirements:
-              job.candidateRequirements || job.requirements?.join("\n") || "",
+            jobDescription: descHtml,
+            candidateRequirements: reqHtml,
             companyId: job.company?._id || defaultCompanyId,
           });
         }
@@ -291,10 +316,10 @@ const CreateJobs = () => {
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />
-                  Publishing
+                  {id ? "Updating..." : "Publishing..."}
                 </>
               ) : (
-                "Publish Job"
+                id ? "Update Job" : "Publish Job"
               )}
             </Button>
           </div>

@@ -22,7 +22,10 @@ const useGetAllJobs = () => {
           dispatch(setJob(res.data.job || []));
         }
       } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to fetch jobs");
+        // Silently ignore 401 (unauthenticated) — happens on logout/redirect
+        if (error.response?.status !== 401) {
+          toast.error(error.response?.data?.message || "Failed to fetch jobs");
+        }
         console.error("Error during getting all jobs", error);
       }
     };
