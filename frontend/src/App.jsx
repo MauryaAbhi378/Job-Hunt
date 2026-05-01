@@ -9,7 +9,7 @@ import JobDescription from "./components/layout/JobDescription.jsx";
 import CompanyOverview from "./components/layout/CompanyOverview.jsx";
 import CreateJobs from "./components/admin/CreateJobs.jsx";
 import ProtectedRoute from "./components/admin/ProtectedRoute.jsx";
-import Onboarding from "./components/admin/Onboarding.jsx";
+import Onboarding from "./components/admin/onboarding.jsx";
 import OnboardingRoute from "./components/admin/OnboardingRoute.jsx";
 import Dashboard from "./components/admin/Dashboard.jsx";
 import Applicants from "./components/admin/Applicants.jsx";
