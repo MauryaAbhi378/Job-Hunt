@@ -33,6 +33,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", env: process.env.NODE_ENV });
+});
+
 app.use("/api/user", userRoute);
 app.use("/api/company", companyRoute);
 app.use("/api/job", jobRouter);
@@ -40,10 +44,8 @@ app.use("/api/application", applicationRoute);
 
 const PORT = process.env.PORT || 3000;
 
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, () => {
-    console.log(`Server running on PORT : ${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`Server running on PORT : ${PORT}`);
+});
 
-export default app; 
+export default app;
