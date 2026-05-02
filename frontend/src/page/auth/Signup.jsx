@@ -96,7 +96,7 @@ const Signup = () => {
           toast.success(res.data.message);
         }
       } catch (error) {
-        toast.error(error.response.data.message);
+        toast.error(error.response?.data?.message || "Something went wrong. Please try again.");
         console.log("Error during Submitting Signup Form", error);
       } finally {
         dispatch(setLoading(false));
