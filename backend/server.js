@@ -21,16 +21,12 @@ app.set("query parser", (str) => {
 
 app.use(cors({
   origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:5173',
-      process.env.CLIENT_URL,
-    ];
-    // Allow requests with no origin (mobile apps, curl, etc.)
+    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    // Allow the exact production URL or any Vercel preview deployment
+    // Allow localhost and any vercel.app deployment
     if (
-      allowedOrigins.includes(origin) ||
-      origin.match(/https:\/\/job-hunt-mvop.*\.vercel\.app$/)
+      origin.startsWith('http://localhost') ||
+      origin.endsWith('.vercel.app')
     ) {
       return callback(null, true);
     }
