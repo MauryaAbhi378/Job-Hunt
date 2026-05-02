@@ -4,9 +4,8 @@ import Footer from "../components/layout/Footer.jsx";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import useGetAllJobs from "../hooks/useGetAllJobs.jsx"
+
 const Home = () => {
-  useGetAllJobs()
   const { user } = useSelector((store) => store.auth);
   const navigate = useNavigate();
   useEffect(() => {
