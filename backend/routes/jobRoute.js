@@ -13,12 +13,13 @@ import {
 const router = express.Router();
 
 router.route("/post").post(isAuthenticated, isOnboardingComplete, postJob);
-router.route("/get").get(isAuthenticated, getAllJobs);
+router.route("/get").get(getAllJobs);
+
 router
   .route("/getadminjobs")
   .get(isAuthenticated, isOnboardingComplete, getAdminJobs);
 
-router.route("/get/:id").get(isAuthenticated, getJobById);
+router.route("/get/:id").get(getJobById);
 
 router
   .route("/job/update/:id")
