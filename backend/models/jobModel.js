@@ -34,12 +34,10 @@ const jobSchema = new mongoose.Schema(
     salary: {
       min: { type: Number, required: true },
       max: { type: Number, required: true },
-      required : true,
     },
     experienceLevel: {
       min: { type: Number, required: true },
       max: { type: Number, required: true },
-      required : true,
     },
     company: {
       type: mongoose.Schema.Types.ObjectId,
