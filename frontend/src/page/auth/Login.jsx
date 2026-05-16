@@ -31,13 +31,15 @@ const Login = () => {
   const submitHandler = async (e) => {
     e.preventDefault();
 
-    const formData = new FormData();
-    formData.append("email", input.email);
-    formData.append("password", input.password);
-    formData.append("role", input.role);
+    const payload = {
+      email: input.email,
+      password: input.password,
+      role: input.role,
+    };
+
     try {
       dispatch(setLoading(true));
-      const res = await axios.post(`${USER_API_ENDPOINT}/login`, formData, {
+      const res = await axios.post(`${USER_API_ENDPOINT}/login`, payload, {
         headers: {
           "Content-Type": "application/json",
         },

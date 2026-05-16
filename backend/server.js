@@ -15,6 +15,17 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  process.env.FRONTEND_URL,
+  process.env.CLIENT_URL,
+  'http://44.218.21.26',
+  'http://localhost:5173',
+  'http://localhost:3000',
+]
+  .filter(Boolean)
+  .flatMap((origin) => origin.split(","))
+  .map((origin) => origin.trim().replace(/\/$/, ""));
+
 app.set("query parser", (str) => {
   return qs.parse(str, { arrayLimit: 1000 });
 });
@@ -22,10 +33,8 @@ app.set("query parser", (str) => {
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (
-      origin.startsWith('http://localhost') ||
-      origin === 'http://44.218.21.26'
-    ) {
+    const normalizedOrigin = origin.replace(/\/$/, "");
+    if (allowedOrigins.includes(normalizedOrigin)) {
       return callback(null, true);
     }
     return callback(new Error('Not allowed by CORS'));

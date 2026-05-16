@@ -213,7 +213,7 @@ const JobDescription = () => {
                   </div>
                 </div>
 
-                {user?.role === "student" && (
+                {user?.role?.toLowerCase() === "student" && (
                   <Button
                     onClick={isApplied ? undefined : applyJobHandler}
                     disabled={isApplied}
@@ -360,7 +360,7 @@ const JobDescription = () => {
               </div>
             </div>
 
-            {user?.role === "student" && (
+            {user?.role?.toLowerCase() === "student" && (
               <RelatedJobs currentJobId={jobId} title={singleJob?.title || ""} />
             )}
           </aside>

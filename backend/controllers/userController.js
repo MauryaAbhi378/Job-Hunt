@@ -9,9 +9,18 @@ import path from "path";
 export const register = async (req, res) => {
   try {
     const { fullname, email, password, phoneNumber, role } = req.body;
-    if (!fullname || !email || !password || !phoneNumber || !role) {
+    const normalizedRole = role?.toLowerCase().trim();
+
+    if (!fullname || !email || !password || !phoneNumber || !normalizedRole) {
       return res.status(400).json({
         message: "Something is missing",
+        success: false,
+      });
+    }
+
+    if (!["student", "recruiter"].includes(normalizedRole)) {
+      return res.status(400).json({
+        message: "Invalid role selected",
         success: false,
       });
     }
@@ -37,7 +46,7 @@ export const register = async (req, res) => {
       email,
       password: hashedPassword,
       phoneNumber,
-      role,
+      role: normalizedRole,
       profile: {
         profilePhoto: profilePhotoUrl,
       },
@@ -59,9 +68,18 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
-    if (!email || !password || !role) {
+    const normalizedRole = role?.toLowerCase().trim();
+
+    if (!email || !password || !normalizedRole) {
       return res.status(400).json({
         message: "Something is missing",
+        success: false,
+      });
+    }
+
+    if (!["student", "recruiter"].includes(normalizedRole)) {
+      return res.status(400).json({
+        message: "Invalid role selected",
         success: false,
       });
     }
@@ -82,7 +100,7 @@ export const login = async (req, res) => {
       });
     }
 
-    if (role !== user.role) {
+    if (normalizedRole !== user.role.toLowerCase()) {
       return res.status(404).json({
         message: "Account doesn't exists with current role",
         success: false,
@@ -113,7 +131,7 @@ export const login = async (req, res) => {
       fullname: user.fullname,
       email: user.email,
       phoneNumber: user.phoneNumber,
-      role: user.role,
+      role: user.role.toLowerCase(),
       profile: user.profile,
     };
     // 🍪 Set token in HTTP-only cookie for client storage
@@ -271,7 +289,7 @@ export const updateProfile = async (req, res) => {
         fullname: user.fullname,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        role: user.role,
+        role: user.role.toLowerCase(),
         profile: user.profile,
       },
       success: true,

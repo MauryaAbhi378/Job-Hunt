@@ -39,7 +39,9 @@ const Navbar = () => {
   };
 
   // Don't show navbar for recruiter
-  if (user && user.role === "recruiter") {
+  const role = user?.role?.toLowerCase();
+
+  if (user && role === "recruiter") {
     return null;
   }
 
@@ -53,7 +55,7 @@ const Navbar = () => {
         </div>
         <div className="flex items-center gap-12">
           <ul className="flex font-medium items-center gap-5">
-            {user && user.role === "student" ? (
+            {user && role === "student" ? (
               <>
                 <li>
                   <Link to="/jobs">Jobs</Link>

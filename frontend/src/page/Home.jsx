@@ -10,9 +10,11 @@ const Home = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (user) {
-      if (user.role === "recruiter") {
+      const role = user.role?.toLowerCase();
+
+      if (role === "recruiter") {
         navigate("/admin/dashboard");
-      } else if (user.role === "student") {
+      } else if (role === "student") {
         navigate("/jobs");
       }
     }
