@@ -21,12 +21,10 @@ app.set("query parser", (str) => {
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, Postman)
     if (!origin) return callback(null, true);
-    // Allow localhost and any vercel.app deployment
     if (
       origin.startsWith('http://localhost') ||
-      origin.endsWith('.vercel.app')
+      origin === 'http://44.218.21.26'
     ) {
       return callback(null, true);
     }
